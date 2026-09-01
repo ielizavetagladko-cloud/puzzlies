@@ -1,15 +1,16 @@
 -- Puzzlies — initial schema.
 --
+-- Safe to run more than once: every object is created with a guard, so a
+-- partially applied run can simply be re-run.
+--
 -- Guiding rule: anything a player could profit from is written by the database,
 -- never by the browser. Points, unlocks and orders have no client-facing write
 -- policy at all; they change only through the SECURITY DEFINER functions at the
 -- bottom of this file, which run with `auth.uid()` as the acting user.
 
-create extension if not exists "pgcrypto";
-
 -- ---------------------------------------------------------------- catalogue
 
-create table public.categories (
+create table if not exists public.categories (
   id          text primary key,
   title_uk    text not null,
   title_en    text not null,
@@ -20,7 +21,7 @@ create table public.categories (
   sort_order  int  not null default 0
 );
 
-create table public.puzzles (
+create table if not exists public.puzzles (
   id          text primary key,
   category_id text not null references public.categories (id) on delete cascade,
   title_uk    text not null,
@@ -43,18 +44,18 @@ create table public.puzzles (
     check ((access = 'paid') = (price_cents is not null))
 );
 
-create index puzzles_category_idx on public.puzzles (category_id, sort_order);
+create index if not exists puzzles_category_idx on public.puzzles (category_id, sort_order);
 
 -- ------------------------------------------------------------------ players
 
-create table public.profiles (
+create table if not exists public.profiles (
   id            uuid primary key references auth.users (id) on delete cascade,
   display_name  text,
   points_balance int not null default 0 check (points_balance >= 0),
   created_at    timestamptz not null default now()
 );
 
-create table public.point_transactions (
+create table if not exists public.point_transactions (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references public.profiles (id) on delete cascade,
   delta      int  not null,
@@ -63,9 +64,9 @@ create table public.point_transactions (
   created_at timestamptz not null default now()
 );
 
-create index point_transactions_user_idx on public.point_transactions (user_id, created_at desc);
+create index if not exists point_transactions_user_idx on public.point_transactions (user_id, created_at desc);
 
-create table public.user_unlocks (
+create table if not exists public.user_unlocks (
   user_id    uuid not null references public.profiles (id) on delete cascade,
   puzzle_id  text not null references public.puzzles (id) on delete cascade,
   method     text not null check (method in ('points', 'purchase')),
@@ -73,7 +74,7 @@ create table public.user_unlocks (
   primary key (user_id, puzzle_id)
 );
 
-create table public.puzzle_progress (
+create table if not exists public.puzzle_progress (
   user_id         uuid not null references public.profiles (id) on delete cascade,
   puzzle_id       text not null references public.puzzles (id) on delete cascade,
   difficulty      text not null check (difficulty in ('easy', 'medium', 'hard', 'expert')),
@@ -86,7 +87,7 @@ create table public.puzzle_progress (
   primary key (user_id, puzzle_id, difficulty)
 );
 
-create table public.orders (
+create table if not exists public.orders (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid not null references public.profiles (id) on delete cascade,
   puzzle_id    text not null references public.puzzles (id) on delete restrict,
@@ -99,11 +100,11 @@ create table public.orders (
   paid_at      timestamptz
 );
 
-create index orders_user_idx on public.orders (user_id, created_at desc);
+create index if not exists orders_user_idx on public.orders (user_id, created_at desc);
 
 -- ------------------------------------------------- profile on user creation
 
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
@@ -122,6 +123,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
@@ -137,33 +139,42 @@ alter table public.puzzle_progress   enable row level security;
 alter table public.orders            enable row level security;
 
 -- The catalogue is public; guests browse it without an account.
+drop policy if exists "catalogue is readable by anyone" on public.categories;
 create policy "catalogue is readable by anyone"
   on public.categories for select using (true);
 
+drop policy if exists "active puzzles are readable by anyone" on public.puzzles;
 create policy "active puzzles are readable by anyone"
   on public.puzzles for select using (is_active);
 
 -- Everything else: read your own rows, write nothing directly.
+drop policy if exists "read own profile" on public.profiles;
 create policy "read own profile"
   on public.profiles for select using (auth.uid() = id);
 
+drop policy if exists "read own transactions" on public.point_transactions;
 create policy "read own transactions"
   on public.point_transactions for select using (auth.uid() = user_id);
 
+drop policy if exists "read own unlocks" on public.user_unlocks;
 create policy "read own unlocks"
   on public.user_unlocks for select using (auth.uid() = user_id);
 
+drop policy if exists "read own orders" on public.orders;
 create policy "read own orders"
   on public.orders for select using (auth.uid() = user_id);
 
 -- Board state is the one thing the browser may write: it is not worth anything
 -- on its own, and the reward for finishing is calculated server side anyway.
+drop policy if exists "read own progress" on public.puzzle_progress;
 create policy "read own progress"
   on public.puzzle_progress for select using (auth.uid() = user_id);
 
+drop policy if exists "write own progress" on public.puzzle_progress;
 create policy "write own progress"
   on public.puzzle_progress for insert with check (auth.uid() = user_id);
 
+drop policy if exists "update own progress" on public.puzzle_progress;
 create policy "update own progress"
   on public.puzzle_progress for update using (auth.uid() = user_id);
 
@@ -175,12 +186,14 @@ grant update (display_name) on public.profiles to authenticated;
 -- ------------------------------------------------------- scoring functions
 
 -- How long a board is expected to take, used to cap implausible times.
-create function public.difficulty_meta(p_difficulty text)
+create or replace function public.difficulty_meta(p_difficulty text)
 returns table (pieces int, base_reward int, par_seconds int, min_seconds int)
 language sql
 immutable
 as $$
-  select *
+  -- Only the four declared columns: `select *` would also return the
+  -- difficulty name and the types would no longer line up.
+  select t.pieces, t.base_reward, t.par_seconds, t.min_seconds
   from (values
     ('easy',   12,  10,   45,   8),
     ('medium', 48,  30,  240,  40),
@@ -197,7 +210,7 @@ $$;
  * the browser only reports which board it finished and how long it took, and
  * even that is clamped to a plausible minimum.
  */
-create function public.complete_puzzle(
+create or replace function public.complete_puzzle(
   p_puzzle_id  text,
   p_difficulty text,
   p_seconds    int
@@ -222,7 +235,7 @@ begin
   end if;
 
   select * into v_meta from public.difficulty_meta(p_difficulty);
-  if v_meta is null then
+  if not found then
     raise exception 'unknown difficulty %', p_difficulty using errcode = '22023';
   end if;
 
@@ -276,7 +289,7 @@ end;
 $$;
 
 /** Spends points to unlock a picture. Paid-only pictures are never unlockable. */
-create function public.unlock_with_points(p_puzzle_id text)
+create or replace function public.unlock_with_points(p_puzzle_id text)
 returns table (ok boolean, reason text, balance int)
 language plpgsql
 security definer
@@ -307,6 +320,10 @@ begin
   -- Locking the profile row keeps two parallel unlocks from spending the same
   -- points twice.
   select points_balance into v_balance from public.profiles where id = v_user for update;
+
+  if v_balance is null then
+    ok := false; reason := 'no-profile'; balance := null; return next; return;
+  end if;
 
   if v_balance < v_puzzle.points_cost then
     ok := false; reason := 'not-enough'; balance := v_balance; return next; return;
