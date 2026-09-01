@@ -44,6 +44,7 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   const { dict } = useI18n();
   const {
     pending,
+    mode,
     requestEmailLink,
     completeEmailLink,
     cancelEmailLink,
@@ -53,18 +54,19 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   const isApple = useIsApplePlatform();
 
   const [email, setEmail] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!isValidEmail(email)) {
-      setError(true);
+      setError(dict.auth.invalidEmail);
       return;
     }
     setBusy(true);
-    await requestEmailLink(email);
+    const result = await requestEmailLink(email);
     setBusy(false);
+    if (!result.ok) setError(dict.auth.sendFailed);
   }
 
   async function openLink() {
@@ -74,19 +76,22 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
     if (result.ok) onSignedIn?.();
   }
 
-  async function google() {
+  async function startProvider(start: () => Promise<{ ok: boolean; reason?: string }>) {
     setBusy(true);
-    await signInWithGoogle();
+    setError(null);
+    const result = await start();
     setBusy(false);
-    onSignedIn?.();
+    if (!result.ok) {
+      setError(dict.auth.providerUnavailable);
+      return;
+    }
+    // Supabase navigates away to the provider; only the demo path returns here
+    // already signed in.
+    if (mode === "demo") onSignedIn?.();
   }
 
-  async function apple() {
-    setBusy(true);
-    await signInWithApple();
-    setBusy(false);
-    onSignedIn?.();
-  }
+  const google = () => startProvider(signInWithGoogle);
+  const apple = () => startProvider(signInWithApple);
 
   const appleButton = (
     <Button key="apple" variant="apple" size="lg" className="w-full" disabled={busy} onClick={apple}>
@@ -111,11 +116,16 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
             {fmt(dict.auth.sentTitle, { email: pending.email })}
           </p>
           <p className="mt-1 text-sm text-pretty text-ink-soft">{dict.auth.sentHint}</p>
+          {mode === "supabase" && (
+            <p className="mt-2 text-xs text-pretty text-ink-soft">{dict.auth.checkSpam}</p>
+          )}
         </div>
 
-        <Button variant="primary" size="lg" className="w-full" disabled={busy} onClick={openLink}>
-          ✉️ {dict.auth.demoOpen}
-        </Button>
+        {mode === "demo" && (
+          <Button variant="primary" size="lg" className="w-full" disabled={busy} onClick={openLink}>
+            ✉️ {dict.auth.demoOpen}
+          </Button>
+        )}
 
         <button
           type="button"
@@ -125,7 +135,9 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
           {dict.auth.changeEmail}
         </button>
 
-        <p className="text-center text-xs text-pretty text-ink-soft">⚠️ {dict.auth.demoNotice}</p>
+        {mode === "demo" && (
+          <p className="text-center text-xs text-pretty text-ink-soft">⚠️ {dict.auth.demoNotice}</p>
+        )}
       </div>
     );
   }
@@ -145,13 +157,12 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);
-            setError(false);
+            setError(null);
           }}
           className={`h-12 w-full rounded-full border bg-surface px-5 text-base text-ink outline-none transition-colors placeholder:text-ink-soft/70 focus:border-primary ${
             error ? "border-blush" : "border-line"
           }`}
         />
-        {error && <p className="px-2 text-sm text-blush-ink">{dict.auth.invalidEmail}</p>}
 
         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={busy}>
           {dict.auth.sendLink}
@@ -173,7 +184,11 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
         {isApple ? [appleButton, googleButton] : [googleButton, appleButton]}
       </div>
 
-      <p className="text-center text-xs text-pretty text-ink-soft">⚠️ {dict.auth.demoNotice}</p>
+      {error && <p className="text-center text-sm text-pretty text-blush-ink">{error}</p>}
+
+      {mode === "demo" && (
+        <p className="text-center text-xs text-pretty text-ink-soft">⚠️ {dict.auth.demoNotice}</p>
+      )}
     </div>
   );
 }

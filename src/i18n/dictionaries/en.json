@@ -125,7 +125,10 @@
     "why1": "Bought pictures never disappear",
     "why2": "Points and collection on every device",
     "why3": "No passwords — just a link in your inbox",
-    "playAsGuest": "Keep playing as a guest"
+    "playAsGuest": "Keep playing as a guest",
+    "providerUnavailable": "This sign-in method isn't connected yet. Use the email link instead.",
+    "checkSpam": "No email after a minute? Have a look in your spam folder.",
+    "sendFailed": "Could not send the email. Try again in a minute."
   },
   "profile": {
     "title": "Profile",

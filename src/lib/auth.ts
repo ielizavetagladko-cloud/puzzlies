@@ -1,25 +1,28 @@
 "use client";
 
+import type { Session, User } from "@supabase/supabase-js";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+
 /**
- * Account store — demo implementation.
+ * Account store.
  *
- * The whole point of this module is the shape of its API: `requestEmailLink`,
- * `completeEmailLink`, `signInWithGoogle`, `signInWithApple`, `signOut`. When
- * Supabase Auth is wired up, only the bodies change
- * (`supabase.auth.signInWithOtp`, `signInWithOAuth({ provider: "google" |
- * "apple" })`, `signOut`) — the screens calling them stay as they are.
+ * With Supabase configured this is real authentication: a magic link by email,
+ * or an OAuth provider. Without it the store falls back to a local demo account
+ * so the sign-in flow can still be walked through — which is what the deployed
+ * site did before the project existed.
  *
- * For now the "magic link" is not emailed anywhere: the pending token is kept
- * locally and the sign-in screen offers a button that opens it, so the flow can
- * be walked through end to end.
+ * Either way the surface is the same, so no screen needs to know which mode it
+ * is in beyond hiding the demo-only "open the link" button.
  */
 
-const STORAGE_KEY = "puzzlies.account.v1";
+const DEMO_KEY = "puzzlies.account.v1";
 const PENDING_KEY = "puzzlies.account.pending.v1";
 
 export type Provider = "email" | "google" | "apple";
+export type AuthMode = "supabase" | "demo";
 
 export type Account = {
   id: string;
@@ -30,17 +33,30 @@ export type Account = {
   linkedGuestProgress: boolean;
 };
 
-export type PendingLink = { email: string; token: string; sentAt: number };
+export type PendingLink = { email: string; sentAt: number };
 
-type Snapshot = { user: Account | null; pending: PendingLink | null; ready: boolean };
+type Snapshot = {
+  user: Account | null;
+  pending: PendingLink | null;
+  ready: boolean;
+  mode: AuthMode;
+};
 
-const serverSnapshot: Snapshot = { user: null, pending: null, ready: false };
+const mode: AuthMode = isSupabaseConfigured ? "supabase" : "demo";
+
+const serverSnapshot: Snapshot = { user: null, pending: null, ready: false, mode };
 let snapshot: Snapshot = serverSnapshot;
+let initialised = false;
 
 const listeners = new Set<() => void>();
 
 function emit() {
   for (const listener of listeners) listener();
+}
+
+function set(next: Partial<Snapshot>) {
+  snapshot = { ...snapshot, ...next, ready: true };
+  emit();
 }
 
 function read<T>(key: string): T | null {
@@ -57,20 +73,52 @@ function write(key: string, value: unknown) {
     if (value === null) window.localStorage.removeItem(key);
     else window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* private mode — the demo account just will not survive a reload */
+    /* private mode — nothing to persist to */
   }
+}
+
+function accountFromUser(user: User | null | undefined): Account | null {
+  if (!user) return null;
+  const raw = (user.app_metadata?.provider ?? "email") as string;
+  const provider: Provider = raw === "google" || raw === "apple" ? raw : "email";
+  return {
+    id: user.id,
+    email: user.email ?? "",
+    provider,
+    createdAt: Date.parse(user.created_at ?? "") || Date.now(),
+    // Guest progress lives in this browser and is adopted on sign-in; the
+    // merge into the database lands with the server-backed store.
+    linkedGuestProgress: true,
+  };
+}
+
+function initialise() {
+  if (initialised || typeof window === "undefined") return;
+  initialised = true;
+
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    set({ user: read<Account>(DEMO_KEY), pending: read<PendingLink>(PENDING_KEY) });
+    return;
+  }
+
+  supabase.auth
+    .getSession()
+    .then(({ data }: { data: { session: Session | null } }) => {
+      set({ user: accountFromUser(data.session?.user), pending: read<PendingLink>(PENDING_KEY) });
+    })
+    .catch(() => set({ user: null }));
+
+  supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+    if (session?.user) write(PENDING_KEY, null);
+    set({ user: accountFromUser(session?.user), pending: session?.user ? null : snapshot.pending });
+  });
 }
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  if (!snapshot.ready && typeof window !== "undefined") {
-    snapshot = {
-      user: read<Account>(STORAGE_KEY),
-      pending: read<PendingLink>(PENDING_KEY),
-      ready: true,
-    };
-    queueMicrotask(emit);
-  }
+  initialise();
   return () => {
     listeners.delete(listener);
   };
@@ -84,86 +132,113 @@ function getServerSnapshot() {
   return serverSnapshot;
 }
 
-function setUser(user: Account | null) {
-  snapshot = { ...snapshot, user, pending: null, ready: true };
-  write(STORAGE_KEY, user);
-  write(PENDING_KEY, null);
-  emit();
-}
-
-function setPending(pending: PendingLink | null) {
-  snapshot = { ...snapshot, pending, ready: true };
-  write(PENDING_KEY, pending);
-  emit();
-}
-
-function randomId() {
-  return Math.random().toString(36).slice(2, 12);
-}
-
 export function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
 }
 
-function createAccount(email: string, provider: Provider): Account {
-  return {
-    id: randomId(),
-    email: email.trim().toLowerCase(),
-    provider,
-    createdAt: Date.now(),
-    // Guest progress already lives in this browser, so signing in adopts it.
-    // With Supabase this becomes a real merge of local state into the profile.
-    linkedGuestProgress: true,
-  };
+/** Where the magic link and OAuth providers send the browser back to. */
+function callbackUrl(next?: string) {
+  const url = new URL("/auth/callback", window.location.origin);
+  url.searchParams.set("next", next ?? window.location.pathname);
+  return url.toString();
 }
 
+export type AuthResult = { ok: boolean; reason?: string };
+
 export function useAuth() {
-  const { user, pending, ready } = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const requestEmailLink = useCallback(async (email: string): Promise<AuthResult> => {
+    const address = email.trim();
+    if (!isValidEmail(address)) return { ok: false, reason: "invalid-email" };
+
+    const supabase = getSupabaseBrowserClient();
+    if (supabase) {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: address,
+        options: { emailRedirectTo: callbackUrl() },
+      });
+      if (error) return { ok: false, reason: error.message };
+    }
+
+    const pending: PendingLink = { email: address, sentAt: Date.now() };
+    write(PENDING_KEY, pending);
+    set({ pending });
+    return { ok: true };
+  }, []);
+
+  /** Demo mode only: stands in for the click on the emailed link. */
+  const completeEmailLink = useCallback(async (): Promise<AuthResult> => {
+    const current = snapshot.pending;
+    if (!current || snapshot.mode !== "demo") return { ok: false };
+
+    const account: Account = {
+      id: Math.random().toString(36).slice(2, 12),
+      email: current.email.toLowerCase(),
+      provider: "email",
+      createdAt: Date.now(),
+      linkedGuestProgress: true,
+    };
+    write(DEMO_KEY, account);
+    write(PENDING_KEY, null);
+    set({ user: account, pending: null });
+    return { ok: true };
+  }, []);
+
+  const cancelEmailLink = useCallback(() => {
+    write(PENDING_KEY, null);
+    set({ pending: null });
+  }, []);
+
+  const signInWithProvider = useCallback(
+    async (provider: "google" | "apple"): Promise<AuthResult> => {
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        const account: Account = {
+          id: Math.random().toString(36).slice(2, 12),
+          email:
+            provider === "google"
+              ? "demo.player@gmail.com"
+              : "demo.player@privaterelay.appleid.com",
+          provider,
+          createdAt: Date.now(),
+          linkedGuestProgress: true,
+        };
+        write(DEMO_KEY, account);
+        set({ user: account, pending: null });
+        return { ok: true };
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: callbackUrl() },
+      });
+      // The provider is only usable once it is switched on in the Supabase
+      // dashboard; until then say so plainly instead of failing silently.
+      if (error) return { ok: false, reason: "provider-unavailable" };
+      return { ok: true };
+    },
+    [],
   );
 
-  const requestEmailLink = useCallback(async (email: string) => {
-    if (!isValidEmail(email)) return { ok: false as const, reason: "invalid-email" as const };
-    setPending({ email: email.trim(), token: randomId(), sentAt: Date.now() });
-    return { ok: true as const };
-  }, []);
-
-  /** Stands in for the click on the emailed link. */
-  const completeEmailLink = useCallback(async () => {
-    const current = snapshot.pending;
-    if (!current) return { ok: false as const };
-    setUser(createAccount(current.email, "email"));
-    return { ok: true as const };
-  }, []);
-
-  const cancelEmailLink = useCallback(() => setPending(null), []);
-
-  const signInWithGoogle = useCallback(async (email = "demo.player@gmail.com") => {
-    setUser(createAccount(email, "google"));
-    return { ok: true as const };
-  }, []);
-
-  /**
-   * Sign in with Apple. On iOS and macOS the real flow opens the system sheet
-   * with Face ID / Touch ID; "Hide My Email" then hands us a private relay
-   * address, which is why the account is keyed by id and not by email.
-   */
-  const signInWithApple = useCallback(async (email = "demo.player@privaterelay.appleid.com") => {
-    setUser(createAccount(email, "apple"));
-    return { ok: true as const };
-  }, []);
+  const signInWithGoogle = useCallback(() => signInWithProvider("google"), [signInWithProvider]);
+  const signInWithApple = useCallback(() => signInWithProvider("apple"), [signInWithProvider]);
 
   const signOut = useCallback(async () => {
-    setUser(null);
+    const supabase = getSupabaseBrowserClient();
+    if (supabase) await supabase.auth.signOut();
+    write(DEMO_KEY, null);
+    write(PENDING_KEY, null);
+    set({ user: null, pending: null });
   }, []);
 
   return useMemo(
     () => ({
-      user,
-      pending,
-      ready,
+      user: state.user,
+      pending: state.pending,
+      ready: state.ready,
+      mode: state.mode,
       requestEmailLink,
       completeEmailLink,
       cancelEmailLink,
@@ -174,13 +249,11 @@ export function useAuth() {
     [
       cancelEmailLink,
       completeEmailLink,
-      pending,
-      ready,
       requestEmailLink,
       signInWithApple,
       signInWithGoogle,
       signOut,
-      user,
+      state,
     ],
   );
 }
