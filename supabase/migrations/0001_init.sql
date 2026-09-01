@@ -178,6 +178,28 @@ drop policy if exists "update own progress" on public.puzzle_progress;
 create policy "update own progress"
   on public.puzzle_progress for update using (auth.uid() = user_id);
 
+-- ---------------------------------------------------------------- privileges
+--
+-- Row level security decides *which rows* a role may touch, but the role also
+-- needs the plain table privilege first. New Supabase projects no longer hand
+-- those out automatically, so they are granted explicitly here — narrowly, and
+-- always alongside a policy that scopes them to the caller's own rows.
+
+grant usage on schema public to anon, authenticated;
+
+-- The catalogue is the only thing a signed-out visitor may read.
+grant select on public.categories to anon, authenticated;
+grant select on public.puzzles    to anon, authenticated;
+
+-- Own rows only, and read-only: these tables are written by the functions below.
+grant select on public.profiles           to authenticated;
+grant select on public.point_transactions to authenticated;
+grant select on public.user_unlocks       to authenticated;
+grant select on public.orders             to authenticated;
+
+-- Board state is the one table a browser session may write to.
+grant select, insert, update on public.puzzle_progress to authenticated;
+
 -- The balance must never be writable from a browser session, not even by a
 -- policy mistake later on: take the privilege away at the column level.
 revoke update on public.profiles from authenticated;
