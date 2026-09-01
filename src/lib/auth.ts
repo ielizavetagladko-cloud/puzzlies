@@ -4,7 +4,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
 /**
  * Account store.
@@ -35,16 +35,28 @@ export type Account = {
 
 export type PendingLink = { email: string; sentAt: number };
 
+/** Which social providers are actually switched on in the Supabase project. */
+export type EnabledProviders = { google: boolean; apple: boolean };
+
 type Snapshot = {
   user: Account | null;
   pending: PendingLink | null;
   ready: boolean;
   mode: AuthMode;
+  providers: EnabledProviders;
 };
 
 const mode: AuthMode = isSupabaseConfigured ? "supabase" : "demo";
 
-const serverSnapshot: Snapshot = { user: null, pending: null, ready: false, mode };
+const serverSnapshot: Snapshot = {
+  user: null,
+  pending: null,
+  ready: false,
+  mode,
+  // In demo mode every button works; with a real project we ask which
+  // providers are on before offering them.
+  providers: { google: mode === "demo", apple: mode === "demo" },
+};
 let snapshot: Snapshot = serverSnapshot;
 let initialised = false;
 
@@ -92,6 +104,32 @@ function accountFromUser(user: User | null | undefined): Account | null {
   };
 }
 
+/**
+ * Asks the project which sign-in methods are enabled.
+ *
+ * This matters because `signInWithOAuth` does not call the API — it redirects
+ * the browser straight to Supabase, which answers a disabled provider with raw
+ * JSON. There is no error for the client to catch, so the only way to keep that
+ * page from ever appearing is to not offer the button in the first place.
+ */
+async function loadProviders() {
+  try {
+    const response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
+      headers: { apikey: supabaseAnonKey },
+    });
+    if (!response.ok) return;
+    const settings = (await response.json()) as { external?: Record<string, boolean> };
+    set({
+      providers: {
+        google: settings.external?.google === true,
+        apple: settings.external?.apple === true,
+      },
+    });
+  } catch {
+    // Leave the providers hidden — email always works.
+  }
+}
+
 function initialise() {
   if (initialised || typeof window === "undefined") return;
   initialised = true;
@@ -102,6 +140,8 @@ function initialise() {
     set({ user: read<Account>(DEMO_KEY), pending: read<PendingLink>(PENDING_KEY) });
     return;
   }
+
+  void loadProviders();
 
   supabase.auth
     .getSession()
@@ -239,6 +279,7 @@ export function useAuth() {
       pending: state.pending,
       ready: state.ready,
       mode: state.mode,
+      providers: state.providers,
       requestEmailLink,
       completeEmailLink,
       cancelEmailLink,

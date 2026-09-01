@@ -45,6 +45,7 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   const {
     pending,
     mode,
+    providers,
     requestEmailLink,
     completeEmailLink,
     cancelEmailLink,
@@ -106,6 +107,18 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
       {dict.auth.google}
     </Button>
   );
+
+  // Apple first on Apple devices, where it opens the system sheet.
+  const ordered = isApple
+    ? [
+        { on: providers.apple, node: appleButton },
+        { on: providers.google, node: googleButton },
+      ]
+    : [
+        { on: providers.google, node: googleButton },
+        { on: providers.apple, node: appleButton },
+      ];
+  const available = ordered.filter((item) => item.on).map((item) => item.node);
 
   if (pending) {
     return (
@@ -169,20 +182,21 @@ export function SignInPanel({ onSignedIn }: { onSignedIn?: () => void }) {
         </Button>
       </form>
 
-      <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="font-display text-xs font-bold text-ink-soft uppercase">
-          {dict.auth.or}
-        </span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      {available.length > 0 && (
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-line" />
+          <span className="font-display text-xs font-bold text-ink-soft uppercase">
+            {dict.auth.or}
+          </span>
+          <span className="h-px flex-1 bg-line" />
+        </div>
+      )}
 
-      {/* Apple first on Apple devices, where it opens the system sheet.
-          The gap allows for the 5px ledge under each button, which does not
-          take up layout space. */}
-      <div className="space-y-4">
-        {isApple ? [appleButton, googleButton] : [googleButton, appleButton]}
-      </div>
+      {/* Only providers that are actually switched on in the project: a
+          disabled one would dump raw JSON in the browser instead of failing
+          politely. The gap allows for the 5px ledge under each button, which
+          does not take up layout space. */}
+      {available.length > 0 && <div className="space-y-4">{available}</div>}
 
       {error && <p className="text-center text-sm text-pretty text-blush-ink">{error}</p>}
 
