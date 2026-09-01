@@ -1,26 +1,283 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------
+   Pastel game theme tokens
+   --------------------------------------------------------------- */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --paper: #fff8f0;
+  --paper-2: #ffeede;
+  --surface: #ffffff;
+  --surface-2: #fff4ea;
+  --line: #f0e0d2;
+
+  /* text */
+  --ink: #4a4458;
+  --ink-soft: #857e9b;
+
+  /* pastel palette */
+  --mint: #a8e6cf;
+  --peach: #ffd3b6;
+  --lilac: #d6c7f5;
+  --sky: #b5deff;
+  --blush: #ffb7b2;
+  --lemon: #ffeaa7;
+
+  /* saturated variants for text / icons on light surfaces */
+  --mint-ink: #2f8f6d;
+  --peach-ink: #c4703a;
+  --lilac-ink: #6d54c8;
+  --sky-ink: #2b7fc4;
+  --blush-ink: #c85a54;
+
+  /* roles */
+  --primary: #8b7be8;
+  --primary-strong: #6f5ed6;
+  --primary-on: #ffffff;
+  --coin: #f6c453;
+  --coin-deep: #d99f22;
+  --locked: #b9b2c9;
+
+  /* Sign in with Apple: black button on light backgrounds, white on dark
+     (both are allowed by Apple's brand guidelines). */
+  --apple-bg: #000000;
+  --apple-fg: #ffffff;
+  --apple-ledge: #3a3a3c;
+
+  --shadow-rgb: 90 78 120;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --paper: #201b2e;
+    --paper-2: #191527;
+    --surface: #2b2440;
+    --surface-2: #332b4b;
+    --line: #40385a;
+
+    --ink: #f4efff;
+    --ink-soft: #b3aacb;
+
+    --mint: #7fcbb0;
+    --peach: #e0b092;
+    --lilac: #b9a6ec;
+    --sky: #94c4ec;
+    --blush: #e39a95;
+    --lemon: #e6d18d;
+
+    --mint-ink: #a8e6cf;
+    --peach-ink: #ffd3b6;
+    --lilac-ink: #d6c7f5;
+    --sky-ink: #b5deff;
+    --blush-ink: #ffb7b2;
+
+    --primary: #a493f5;
+    --primary-strong: #8b7be8;
+    --primary-on: #241f33;
+    --coin: #f6c453;
+    --coin-deep: #b98615;
+    --locked: #6a6183;
+
+    --apple-bg: #ffffff;
+    --apple-fg: #000000;
+    --apple-ledge: #b0adb8;
+
+    --shadow-rgb: 8 5 16;
   }
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #201b2e;
+  --paper-2: #191527;
+  --surface: #2b2440;
+  --surface-2: #332b4b;
+  --line: #40385a;
+
+  --ink: #f4efff;
+  --ink-soft: #b3aacb;
+
+  --mint: #7fcbb0;
+  --peach: #e0b092;
+  --lilac: #b9a6ec;
+  --sky: #94c4ec;
+  --blush: #e39a95;
+  --lemon: #e6d18d;
+
+  --mint-ink: #a8e6cf;
+  --peach-ink: #ffd3b6;
+  --lilac-ink: #d6c7f5;
+  --sky-ink: #b5deff;
+  --blush-ink: #ffb7b2;
+
+  --primary: #a493f5;
+  --primary-strong: #8b7be8;
+  --primary-on: #241f33;
+  --coin: #f6c453;
+  --coin-deep: #b98615;
+  --locked: #6a6183;
+
+  --apple-bg: #ffffff;
+  --apple-fg: #000000;
+  --apple-ledge: #b0adb8;
+
+  --shadow-rgb: 8 5 16;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+
+  --color-mint: var(--mint);
+  --color-peach: var(--peach);
+  --color-lilac: var(--lilac);
+  --color-sky: var(--sky);
+  --color-blush: var(--blush);
+  --color-lemon: var(--lemon);
+
+  --color-mint-ink: var(--mint-ink);
+  --color-peach-ink: var(--peach-ink);
+  --color-lilac-ink: var(--lilac-ink);
+  --color-sky-ink: var(--sky-ink);
+  --color-blush-ink: var(--blush-ink);
+
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-on: var(--primary-on);
+  --color-coin: var(--coin);
+  --color-coin-deep: var(--coin-deep);
+  --color-locked: var(--locked);
+  --color-apple-bg: var(--apple-bg);
+  --color-apple-fg: var(--apple-fg);
+  --color-apple-ledge: var(--apple-ledge);
+
+  --font-display: var(--font-comfortaa), "Trebuchet MS", system-ui, sans-serif;
+  --font-sans: var(--font-nunito), system-ui, -apple-system, sans-serif;
+
+  --radius-blob: 2rem;
+
+  --shadow-soft: 0 12px 30px -14px rgb(var(--shadow-rgb) / 0.45);
+  --shadow-card: 0 2px 0 0 rgb(var(--shadow-rgb) / 0.08), 0 14px 28px -18px rgb(var(--shadow-rgb) / 0.55);
+  --shadow-lift: 0 6px 0 0 rgb(var(--shadow-rgb) / 0.1), 0 22px 40px -20px rgb(var(--shadow-rgb) / 0.6);
+
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-shine: shine 2.6s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shine {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.18);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -15vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 92vh, 0) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--lilac) 45%, transparent) 0, transparent 38%),
+    radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--sky) 40%, transparent) 0, transparent 34%),
+    radial-gradient(circle at 78% 92%, color-mix(in srgb, var(--mint) 38%, transparent) 0, transparent 36%),
+    radial-gradient(circle at 8% 88%, color-mix(in srgb, var(--peach) 42%, transparent) 0, transparent 32%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--lilac) 70%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Reusable game bits
+   --------------------------------------------------------------- */
+
+@utility card-soft {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

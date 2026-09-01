@@ -1,0 +1,149 @@
+{
+  "common": {
+    "appName": "Puzzlies",
+    "tagline": "Solve, earn points, unlock new pictures",
+    "play": "Play",
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "points": "points",
+    "pointsShort": "pts",
+    "free": "Free",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "profile": "Profile",
+    "theme": "Theme",
+    "language": "Language"
+  },
+  "home": {
+    "heroTitle": "Solve puzzles, unlock new worlds",
+    "heroSubtitle": "Every finished picture earns points. Spend them to unlock the next puzzles.",
+    "heroCta": "Start playing",
+    "heroSecondary": "My profile",
+    "continueTitle": "Continue playing",
+    "continueEmpty": "Nothing started yet. Pick a picture below!",
+    "categoriesTitle": "Categories",
+    "categoriesSubtitle": "Pick today's mood",
+    "freeTitle": "Free puzzles",
+    "freeSubtitle": "Start here — these are open right away",
+    "statPoints": "Points",
+    "statSolved": "Solved",
+    "statTime": "Played"
+  },
+  "category": {
+    "puzzles": "puzzles",
+    "backToAll": "All categories",
+    "empty": "Nothing here yet"
+  },
+  "puzzle": {
+    "chooseDifficulty": "Choose difficulty",
+    "pieces": "pieces",
+    "best": "Best time",
+    "notPlayed": "Not solved yet",
+    "start": "Solve this puzzle",
+    "unlockFor": "Unlock for {n} points",
+    "buyFor": "Buy for {price}",
+    "notEnoughPoints": "{n} more points needed",
+    "lockedHint": "This picture is still locked",
+    "paidOnly": "This picture is available by purchase only",
+    "reward": "Reward",
+    "unlockedAt": "Unlocked"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Normal",
+    "hard": "Hard",
+    "expert": "Expert"
+  },
+  "game": {
+    "time": "Time",
+    "placed": "Placed",
+    "preview": "Hint",
+    "shuffle": "Shuffle",
+    "sound": "Sound",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fit": "Fit",
+    "exit": "Exit",
+    "saved": "Progress saved",
+    "loadingImage": "Cutting the pieces…"
+  },
+  "win": {
+    "title": "Solved!",
+    "subtitle": "The picture is complete",
+    "time": "Your time",
+    "earned": "Points earned",
+    "newBest": "New record!",
+    "again": "Play again",
+    "toCategory": "Back to category",
+    "next": "Next puzzle"
+  },
+  "unlock": {
+    "title": "Unlock this picture?",
+    "cost": "Cost",
+    "balance": "Your balance",
+    "confirm": "Unlock",
+    "notEnough": "A few more points and it's yours. Solve a free one!",
+    "success": "Picture unlocked!"
+  },
+  "shop": {
+    "buyTitle": "Buy this picture",
+    "mockNotice": "Test payment: no real money is charged.",
+    "confirm": "Confirm purchase",
+    "success": "Thank you! The picture is unlocked."
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "account": "Account",
+    "title": "Sign in to Puzzlies",
+    "subtitle": "So your points, collection and purchases stay yours on every device",
+    "purchaseTitle": "One step from the picture",
+    "purchaseSubtitle": "An account keeps a bought picture yours forever — even after you switch browser or phone.",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Send me a link",
+    "google": "Continue with Google",
+    "apple": "Continue with Apple",
+    "or": "or",
+    "sentTitle": "Link sent to {email}",
+    "sentHint": "Open the link from the email to finish signing in. No password to invent.",
+    "demoOpen": "Open the link (demo)",
+    "demoNotice": "Demo sign-in: no real email is sent yet, the account lives in this browser only.",
+    "changeEmail": "Use another address",
+    "invalidEmail": "That address looks off",
+    "saveProgress": "Save my progress",
+    "saveProgressHint": "Sign in so your points and unlocked pictures survive a cleared browser.",
+    "linked": "Guest progress moved into your account",
+    "whyTitle": "Why an account",
+    "why1": "Bought pictures never disappear",
+    "why2": "Points and collection on every device",
+    "why3": "No passwords — just a link in your inbox",
+    "playAsGuest": "Keep playing as a guest"
+  },
+  "profile": {
+    "title": "Profile",
+    "guest": "Guest",
+    "guestNote": "Progress is stored in this browser only.",
+    "balance": "Balance",
+    "solved": "Puzzles solved",
+    "totalTime": "Total time",
+    "collection": "My collection",
+    "history": "Points history",
+    "historyEmpty": "Empty for now — solve your first puzzle!",
+    "reset": "Reset progress",
+    "resetConfirm": "Really reset all progress and points?"
+  },
+  "reason": {
+    "complete": "Puzzle solved",
+    "replay": "Solved again",
+    "unlock": "Picture unlocked",
+    "welcome": "Welcome bonus"
+  }
+}

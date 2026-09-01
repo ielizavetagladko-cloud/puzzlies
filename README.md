@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Пазлики / Puzzlies
 
-## Getting Started
+Ігровий сайт із пазлами: картинки поділені на категорії, частина безкоштовна, решта
+відкривається за бали або купується за $1.25. Пастельний ігровий стиль, десктоп / планшет /
+мобільний, українська та англійська мови.
 
-First, run the development server:
+## Запуск
+
+Node.js встановлено локально в `~/.local/node` (без прав адміністратора). Якщо `node` не
+знаходиться, додайте його в PATH — рядок уже є в `~/.zshrc`:
+
+```bash
+export PATH="$HOME/.local/node/bin:$PATH"
+```
+
+Далі:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Сайт відкриється на http://localhost:3000 і перекине на `/uk` або `/en` — залежно від мови
+браузера та збереженого вибору.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Інші команди:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Що вже працює
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Каталог**: 4 категорії, 33 картинки; безкоштовні / за бали / платні
+- **Гра**: власний рушій на `<canvas>` — справжні пазлові шматочки з «замочками»,
+  перетягування мишею й пальцем, snap у своє місце, підказка-привид, pinch-zoom і pan
+- **Фрагменти**: шматочки зчіплюються між собою будь-де на столі й далі рухаються як одне
+  ціле; готовий фрагмент лягає в рамку цілком. Перемішування не розриває зібране
+- **Звук**: клац при зчепленні та переможна фанфара — синтезовані через WebAudio, без файлів
+- **Складності**: 12 / 48 / 108 / 300 шматочків
+- **Бали**: нагорода за перше проходження + бонус за швидкість, 20% за повтор
+- **Розблокування**: за бали, з діалогом підтвердження
+- **Акаунт**: гість грає без реєстрації; вхід (magic link на email, Google або Apple)
+  просимо лише при покупці — просто в діалозі, без переходу на іншу сторінку. Є й окрема
+  сторінка `/[lang]/signin` для «зберегти прогрес». На iPhone та Mac кнопка Apple стоїть
+  першою. Поки що це **демо**: листи не надсилаються, акаунт живе в браузері. Уся логіка —
+  в [`src/lib/auth.ts`](src/lib/auth.ts), його й замінить Supabase Auth
+- **Покупка**: мок-провайдер (справжні гроші не списуються) — місце для Stripe
+- **Прогрес**: незавершена дошка й баланс зберігаються у браузері, гру можна продовжити
+- **Двомовність**: `/uk` та `/en` з перемикачем, світла й темна теми
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Структура
 
-## Deploy on Vercel
+```
+src/
+  app/[lang]/            сторінки: головна, категорія, картка пазла, гра, профіль
+  components/            UI, картки, ігровий екран
+  data/catalog.ts        категорії та пазли (тимчасово замість БД)
+  i18n/                  словники uk/en і провайдер
+  lib/
+    points.ts            складності, формули балів, форматування
+    progress.ts          баланс, розблокування, історія (localStorage)
+    puzzle/geometry.ts   форма шматочків (безьє «замочки»)
+    puzzle/engine.ts     рушій: рендер, drag&snap, зум, збереження
+  proxy.ts               редірект на мову
+public/puzzles/          демо-картинки
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Наступні кроки
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Supabase**: таблиці `categories`, `puzzles`, `profiles`, `user_unlocks`,
+   `point_transactions`, `puzzle_progress`, `orders` + RLS; справжня авторизація
+   (`signInWithOtp` і `signInWithOAuth`) замість демо в `src/lib/auth.ts`; перенесення
+   гостьового прогресу в акаунт при першому вході.
+   Бали та розблокування писати **тільки на сервері** — інакше їх можна намалювати з консолі.
+2. **Sign in with Apple** по-справжньому. Потрібні: акаунт Apple Developer Program
+   ($99/рік), Services ID, підтверджений домен і ключ `.p8`; далі в Supabase вмикається
+   провайдер Apple — код кнопки вже готовий. Два нюанси: при «Hide My Email» ви отримаєте
+   relay-адресу (`…@privaterelay.appleid.com`), тому акаунт треба ключувати за `id`, а не
+   за email; імʼя користувача Apple віддає **лише при першому вході** — його треба зберегти
+   одразу. Для сайту Apple-вхід не обовʼязковий, але стане обовʼязковим, якщо колись буде
+   застосунок в App Store з іншими соцвходами.
+3. **Stripe** замість мок-провайдера (`purchase()` у `src/lib/progress.ts`).
+4. **Свої картинки** замість демо: ліцензія Unsplash/Pexels не покриває продаж самого
+   зображення, тому для платних пазлів потрібні власні або ліцензовані на перепродаж.
+5. Дрібниці: PWA-маніфест, шеринг результату, щоденний бонус, сортування шматочків
+   за краями на великих складностях.
+
+## Демо-картинки
+
+`public/puzzles/*.jpg` — фото з [Lorem Picsum](https://picsum.photos) (фото Unsplash).
+Підходять для розробки й безкоштовних категорій; перед запуском платних пазлів замініть їх.

@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -fsSL https://nodejs.org/dist/index.json)",
-      "Bash(python3 -c ' *)"
-    ]
-  }
-}

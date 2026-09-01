@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "puzzles-dev",
+      "runtimeExecutable": "/Users/yekyzavetahladko/app/scripts-dev.sh",
+      "runtimeArgs": [],
+      "port": 3000
+    }
+  ]
+}
