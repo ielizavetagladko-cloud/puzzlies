@@ -124,6 +124,7 @@ export class PuzzleEngine {
     this.resize();
     this.fit();
     this.loop();
+    this.opening();
   }
 
   // ------------------------------------------------------------------ setup
@@ -704,6 +705,7 @@ export class PuzzleEngine {
     this.running = true;
     this.scatter();
     this.options.onProgress?.(0, this.pieces.length);
+    this.opening();
   }
 
   setPreview(on: boolean) {
@@ -827,6 +829,49 @@ export class PuzzleEngine {
     } catch {
       /* audio is a nicety, never a failure */
     }
+  }
+
+  /**
+   * The pieces landing on the table: a low thump, a scatter of soft ticks, and
+   * a rising fourth to say "begin".
+   *
+   * Deliberately quieter and shorter than the fanfare — it plays at the start
+   * of every board, so it has to stay out of the way.
+   *
+   * Browsers refuse to play audio before the page has been interacted with, and
+   * arriving here is a fresh page load. If the context will not start, the
+   * sound is skipped rather than fired late, when it would mean nothing.
+   */
+  private opening() {
+    const ctx = this.ensureAudio();
+    if (!ctx) return;
+
+    const play = () => {
+      if (ctx.state !== "running") return;
+      try {
+        const start = ctx.currentTime + 0.02;
+        const rng = makeRng(this.pieces.length + 1);
+
+        // The box set down on the table.
+        this.tone(ctx, 110, start, 0.3, 0.09, "sine");
+
+        // Pieces tipped out of it.
+        for (let i = 0; i < 5; i += 1) {
+          const at = start + 0.06 + i * 0.055 + rng() * 0.02;
+          this.tone(ctx, 520 + rng() * 320, at, 0.09, 0.05, "triangle");
+        }
+
+        // A rising fourth: G4 → C5, with a breath of an octave above it.
+        this.tone(ctx, 392.0, start + 0.3, 0.26, 0.11, "triangle");
+        this.tone(ctx, 523.25, start + 0.44, 0.5, 0.13, "triangle");
+        this.tone(ctx, 1046.5, start + 0.44, 0.28, 0.035, "sine");
+      } catch {
+        /* audio is a nicety, never a failure */
+      }
+    };
+
+    if (ctx.state === "running") play();
+    else void ctx.resume().then(play).catch(() => {});
   }
 
   /**

@@ -51,7 +51,8 @@ insert into public.puzzles (id, category_id, title_uk, title_en, image, width, h
   ('city-bench', 'city', 'На лавці', 'On the bench', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-bench.jpg', 1200, 900, 'paid', null, 125, 'demo', 31),
   ('city-tunnel', 'city', 'Світло в тунелі', 'Light in the tunnel', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-tunnel.jpg', 1200, 900, 'paid', null, 125, 'demo', 32),
   ('art-the-harvesters', 'art', 'Жнива', 'The Harvesters', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-harvesters.jpg', 2400, 1800, 'points', 200, null, 'public-domain', 33),
-  ('art-the-love-song', 'art', 'Мелодія кохання', 'The Love Song', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-love-song.jpg', 2400, 1800, 'free', null, null, 'own', 34)
+  ('art-the-love-song', 'art', 'Мелодія кохання', 'The Love Song', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-love-song.jpg', 2400, 1800, 'free', null, null, 'public-domain', 34),
+  ('art-piazza-san-marco', 'art', 'Площа Святого Марка', 'Piazza San Marco', 'https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-piazza-san-marco.jpg', 2400, 1800, 'points', 500, null, 'public-domain', 35)
 on conflict (id) do update set
   category_id = excluded.category_id,
   title_uk = excluded.title_uk,

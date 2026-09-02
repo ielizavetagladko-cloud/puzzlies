@@ -518,6 +518,20 @@
       "height": 1800,
       "access": "free",
       "license": "public-domain"
+    },
+    {
+      "id": "art-piazza-san-marco",
+      "categoryId": "art",
+      "title": {
+        "uk": "Площа Святого Марка",
+        "en": "Piazza San Marco"
+      },
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-piazza-san-marco.jpg",
+      "width": 2400,
+      "height": 1800,
+      "access": "points",
+      "pointsCost": 500,
+      "license": "public-domain"
     }
   ]
 }
