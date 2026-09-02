@@ -4,7 +4,10 @@ cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:$HOME/.local/node/bin:$PATH"
 export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-echo "Зміни, які буде викладено:"
+echo "Картинки більше сюди не потрапляють — вони живуть у сховищі Supabase"
+echo "і зʼявляються на сайті одразу після «2-apply.command»."
+echo ""
+echo "Цей крок потрібен лише для змін у коді. Зараз змінилося:"
 echo ""
 git status --short
 echo ""

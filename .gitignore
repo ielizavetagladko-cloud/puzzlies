@@ -45,3 +45,6 @@ next-env.d.ts
 
 # working files for the image pipeline
 /content/
+
+# pictures live in Supabase storage now
+/public/puzzles/

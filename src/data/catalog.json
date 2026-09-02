@@ -79,7 +79,7 @@
         "uk": "Весняне цвітіння",
         "en": "Spring blossom"
       },
-      "image": "/puzzles/106.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-blossom.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -91,7 +91,7 @@
         "uk": "Зелене поле",
         "en": "Green field"
       },
-      "image": "/puzzles/107.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-green-field.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -103,7 +103,7 @@
         "uk": "Літній сад",
         "en": "Summer garden"
       },
-      "image": "/puzzles/127.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-garden.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -115,7 +115,7 @@
         "uk": "Малина на столі",
         "en": "Berries on the table"
       },
-      "image": "/puzzles/102.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-berries.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -128,7 +128,7 @@
         "uk": "Ранкова трава",
         "en": "Morning grass"
       },
-      "image": "/puzzles/109.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-morning.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -141,7 +141,7 @@
         "uk": "Захід над полем",
         "en": "Sunset over the field"
       },
-      "image": "/puzzles/110.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-sunset.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -154,7 +154,7 @@
         "uk": "Колоски",
         "en": "Wheat ears"
       },
-      "image": "/puzzles/112.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-wheat.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -167,7 +167,7 @@
         "uk": "Тосканська дорога",
         "en": "Tuscan road"
       },
-      "image": "/puzzles/116.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-tuscany.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -180,7 +180,7 @@
         "uk": "Соняшник",
         "en": "Sunflower"
       },
-      "image": "/puzzles/118.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-sunflower.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -193,7 +193,7 @@
         "uk": "Бірюзове море",
         "en": "Turquoise sea"
       },
-      "image": "/puzzles/124.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-turquoise.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -205,7 +205,7 @@
         "uk": "Тиха гладь",
         "en": "Calm horizon"
       },
-      "image": "/puzzles/135.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-horizon.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -217,7 +217,7 @@
         "uk": "Хвилі",
         "en": "Waves"
       },
-      "image": "/puzzles/126.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-waves.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -230,7 +230,7 @@
         "uk": "Політ над морем",
         "en": "Flight over the sea"
       },
-      "image": "/puzzles/130.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-flight.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -243,7 +243,7 @@
         "uk": "Краплі",
         "en": "Droplets"
       },
-      "image": "/puzzles/123.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-droplets.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -256,7 +256,7 @@
         "uk": "Озеро в горах",
         "en": "Mountain lake"
       },
-      "image": "/puzzles/128.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-lake.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -269,7 +269,7 @@
         "uk": "Скелястий берег",
         "en": "Rocky shore"
       },
-      "image": "/puzzles/132.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-rocky.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -282,7 +282,7 @@
         "uk": "Мушля",
         "en": "Seashell"
       },
-      "image": "/puzzles/139.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-shell.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -295,7 +295,7 @@
         "uk": "Туманні пагорби",
         "en": "Misty hills"
       },
-      "image": "/puzzles/114.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-misty.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -307,7 +307,7 @@
         "uk": "Гірський туман",
         "en": "Mountain fog"
       },
-      "image": "/puzzles/121.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-fog.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -319,7 +319,7 @@
         "uk": "Береги озера",
         "en": "Lake shores"
       },
-      "image": "/puzzles/125.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-shore.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -332,7 +332,7 @@
         "uk": "Камʼяні велетні",
         "en": "Stone giants"
       },
-      "image": "/puzzles/136.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-stone.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -345,7 +345,7 @@
         "uk": "Зоряна ніч",
         "en": "Starry night"
       },
-      "image": "/puzzles/120.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-stars.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -358,7 +358,7 @@
         "uk": "Пальма на світанку",
         "en": "Palm at dawn"
       },
-      "image": "/puzzles/108.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-palm.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -371,7 +371,7 @@
         "uk": "Крижані краплі",
         "en": "Frozen drops"
       },
-      "image": "/puzzles/115.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-ice.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -384,7 +384,7 @@
         "uk": "Синій вітер",
         "en": "Blue wind"
       },
-      "image": "/puzzles/113.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-blue.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -397,7 +397,7 @@
         "uk": "Ретро авто",
         "en": "Retro car"
       },
-      "image": "/puzzles/133.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-retro-car.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -409,7 +409,7 @@
         "uk": "Старий пікап",
         "en": "Old pickup"
       },
-      "image": "/puzzles/111.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-pickup.jpg",
       "width": 1200,
       "height": 900,
       "access": "free"
@@ -421,7 +421,7 @@
         "uk": "Міст уночі",
         "en": "Bridge at night"
       },
-      "image": "/puzzles/122.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-bridge.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -434,7 +434,7 @@
         "uk": "Дерев'яна арка",
         "en": "Wooden arch"
       },
-      "image": "/puzzles/134.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-arch.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -447,7 +447,7 @@
         "uk": "Ловець снів",
         "en": "Dreamcatcher"
       },
-      "image": "/puzzles/104.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-dreamcatcher.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -460,7 +460,7 @@
         "uk": "Вогні концерту",
         "en": "Concert lights"
       },
-      "image": "/puzzles/117.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-crowd.jpg",
       "width": 1200,
       "height": 900,
       "access": "points",
@@ -473,7 +473,7 @@
         "uk": "На лавці",
         "en": "On the bench"
       },
-      "image": "/puzzles/129.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-bench.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -486,7 +486,7 @@
         "uk": "Світло в тунелі",
         "en": "Light in the tunnel"
       },
-      "image": "/puzzles/137.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-tunnel.jpg",
       "width": 1200,
       "height": 900,
       "access": "paid",
@@ -499,7 +499,7 @@
         "uk": "Жнива",
         "en": "The Harvesters"
       },
-      "image": "/puzzles/art-the-harvesters.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-harvesters.jpg",
       "width": 2400,
       "height": 1800,
       "access": "points",

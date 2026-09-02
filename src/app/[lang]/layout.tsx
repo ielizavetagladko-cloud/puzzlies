@@ -45,6 +45,10 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : defaultLocale;
   const dict = await getDictionary(locale);
+  // The picture a shared link shows comes from the catalogue rather than a
+  // hard-coded file, so it cannot point at something that no longer exists.
+  const { puzzles } = await getCatalogue();
+  const cover = puzzles.find((puzzle) => puzzle.access === "free") ?? puzzles[0];
 
   return {
     // Absolute URLs are built from here, so social previews and canonical tags
@@ -67,7 +71,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       description: dict.seo.site,
       url: `/${locale}`,
       locale: locale === "uk" ? "uk_UA" : "en_US",
-      images: [{ url: "/puzzles/106.jpg", width: 1200, height: 900, alt: dict.common.appName }],
+      images: cover
+        ? [{ url: cover.image, width: cover.width, height: cover.height, alt: dict.common.appName }]
+        : undefined,
     },
     twitter: { card: "summary_large_image" },
     verification: { google: googleSiteVerification },

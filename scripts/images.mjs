@@ -22,6 +22,7 @@ const ROOT = process.cwd();
 const INCOMING = path.join(ROOT, "content/incoming");
 const PLAN = path.join(ROOT, "content/plan.json");
 const OUTPUT = path.join(ROOT, "public/puzzles");
+const BUCKET = "puzzles";
 const CATALOG = path.join(ROOT, "src/data/catalog.json");
 
 /** Puzzles are cut on a 4:3 board, so everything is cropped to that. */
@@ -72,6 +73,28 @@ async function upsert(env, table, rows) {
   if (!response.ok) {
     throw new Error(`${table}: ${response.status} ${await response.text()}`);
   }
+}
+
+/** Puts one processed file into the bucket, replacing whatever was there. */
+async function uploadToStorage(env, name, body) {
+  const response = await fetch(
+    `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(name)}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "image/jpeg",
+        "Cache-Control": "public, max-age=31536000, immutable",
+        // Re-uploading the same name replaces the file rather than failing,
+        // so fixing a picture is just running the pipeline again.
+        "x-upsert": "true",
+      },
+      body,
+    },
+  );
+  if (!response.ok) throw new Error(`${name}: ${response.status} ${await response.text()}`);
+  return `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(name)}`;
 }
 
 // --------------------------------------------------------------------- utils
@@ -304,6 +327,9 @@ async function apply() {
 
   await mkdir(OUTPUT, { recursive: true });
 
+  const env = await readEnv();
+  const canWrite = Boolean(env.SUPABASE_SERVICE_ROLE_KEY && env.NEXT_PUBLIC_SUPABASE_URL);
+
   for (const item of items) {
     const source = path.join(INCOMING, item.file);
     const target = path.join(OUTPUT, `${item.id}.jpg`);
@@ -320,11 +346,22 @@ async function apply() {
       .jpeg({ quality: 82, mozjpeg: true })
       .toFile(target);
 
+    // The bucket is the home for pictures; the local copy stays as a source
+    // for re-processing and as a fallback if storage is unreachable.
+    let imageUrl = `/puzzles/${item.id}.jpg`;
+    if (canWrite) {
+      try {
+        imageUrl = await uploadToStorage(env, `${item.id}.jpg`, await readFile(target));
+      } catch (error) {
+        warn(`не вдалося завантажити у сховище: ${error.message}`);
+      }
+    }
+
     const entry = {
       id: item.id,
       categoryId: item.category,
       title: item.title,
-      image: `/puzzles/${item.id}.jpg`,
+      image: imageUrl,
       width,
       height,
       access: item.access,
@@ -337,52 +374,17 @@ async function apply() {
     if (index >= 0) catalog.puzzles[index] = entry;
     else catalog.puzzles.push(entry);
 
-    say(`✓ ${item.id}  ${width}×${height}`);
+    say(`✓ ${item.id}  ${width}×${height}${imageUrl.startsWith("http") ? "  → сховище" : ""}`);
   }
 
   await writeJson(CATALOG, catalog);
   say(`\nКаталог оновлено: ${catalog.puzzles.length} пазлів, ${catalog.categories.length} категорій.`);
 
-  const env = await readEnv();
-  const canWrite = env.SUPABASE_SERVICE_ROLE_KEY && env.NEXT_PUBLIC_SUPABASE_URL;
-
   if (canWrite) {
     try {
-      await upsert(
-        env,
-        "categories",
-        catalog.categories.map((category, index) => ({
-          id: category.id,
-          title_uk: category.title.uk,
-          title_en: category.title.en,
-          blurb_uk: category.blurb?.uk ?? "",
-          blurb_en: category.blurb?.en ?? "",
-          icon: category.icon ?? "🧩",
-          accent: category.accent ?? "mint",
-          sort_order: index,
-        })),
-      );
-      await upsert(
-        env,
-        "puzzles",
-        catalog.puzzles.map((puzzle, index) => ({
-          id: puzzle.id,
-          category_id: puzzle.categoryId,
-          title_uk: puzzle.title.uk,
-          title_en: puzzle.title.en,
-          image: puzzle.image,
-          width: puzzle.width,
-          height: puzzle.height,
-          access: puzzle.access,
-          points_cost: puzzle.pointsCost ?? null,
-          price_cents: puzzle.priceCents ?? null,
-          license: puzzle.license ?? "demo",
-          sort_order: index,
-          is_active: true,
-        })),
-      );
+      await syncCatalogue(env, catalog);
       say("✓ база оновлена — SQL вручну запускати не треба");
-      say("\nЩо далі: «4-publish.command», щоб файли картинок потрапили на сайт.\n");
+      say("\nГотово: картинки вже на сайті, деплой не потрібен.\n");
       return;
     } catch (error) {
       warn(`не вдалося записати в базу: ${error.message}`);
@@ -398,12 +400,94 @@ async function apply() {
   say("  3. «4-publish.command» — викласти картинки на сайт\n");
 }
 
+/** Mirrors the whole catalogue into the database. */
+async function syncCatalogue(env, catalog) {
+  await upsert(
+    env,
+    "categories",
+    catalog.categories.map((category, index) => ({
+      id: category.id,
+      title_uk: category.title.uk,
+      title_en: category.title.en,
+      blurb_uk: category.blurb?.uk ?? "",
+      blurb_en: category.blurb?.en ?? "",
+      icon: category.icon ?? "🧩",
+      accent: category.accent ?? "mint",
+      sort_order: index,
+    })),
+  );
+  await upsert(
+    env,
+    "puzzles",
+    catalog.puzzles.map((puzzle, index) => ({
+      id: puzzle.id,
+      category_id: puzzle.categoryId,
+      title_uk: puzzle.title.uk,
+      title_en: puzzle.title.en,
+      image: puzzle.image,
+      width: puzzle.width,
+      height: puzzle.height,
+      access: puzzle.access,
+      points_cost: puzzle.pointsCost ?? null,
+      price_cents: puzzle.priceCents ?? null,
+      license: puzzle.license ?? "demo",
+      sort_order: index,
+      is_active: true,
+    })),
+  );
+}
+
+// -------------------------------------------------------------------- upload
+
+/**
+ * Moves pictures that still live in the repository into the bucket.
+ *
+ * A one-off for the pictures added before storage existed, but written to be
+ * safe to run at any time: it only touches entries still pointing at a local
+ * path.
+ */
+async function upload() {
+  const env = await readEnv();
+  if (!env.SUPABASE_SERVICE_ROLE_KEY || !env.NEXT_PUBLIC_SUPABASE_URL) {
+    fail("Потрібен SUPABASE_SERVICE_ROLE_KEY у .env.local.");
+  }
+
+  const catalog = await readJson(CATALOG, { categories: [], puzzles: [] });
+  const pending = catalog.puzzles.filter((puzzle) => !puzzle.image.startsWith("http"));
+
+  if (pending.length === 0) {
+    say("\nУсі картинки вже у сховищі.\n");
+    return;
+  }
+
+  say(`\nПереношу у сховище: ${pending.length}\n`);
+
+  for (const puzzle of pending) {
+    const local = path.join(ROOT, "public", puzzle.image.replace(/^\//, ""));
+    if (!existsSync(local)) {
+      warn(`${puzzle.id}: немає файлу ${puzzle.image} — пропускаю`);
+      continue;
+    }
+    try {
+      puzzle.image = await uploadToStorage(env, `${puzzle.id}.jpg`, await readFile(local));
+      say(`✓ ${puzzle.id}`);
+    } catch (error) {
+      warn(`${puzzle.id}: ${error.message}`);
+    }
+  }
+
+  await writeJson(CATALOG, catalog);
+  await syncCatalogue(env, catalog);
+  say("\nГотово. Каталог у базі тепер посилається на сховище.\n");
+}
+
 // ---------------------------------------------------------------------- main
 
 const command = process.argv[2];
 if (command === "scan") await scan();
 else if (command === "apply") await apply();
+else if (command === "upload") await upload();
 else {
-  say("\nВикористання:\n  npm run images:scan\n  npm run images:apply\n");
+  say("\nВикористання:\n  npm run images:scan\n  npm run images:apply\n  npm run images:upload\n");
   process.exit(1);
 }

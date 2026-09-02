@@ -77,6 +77,10 @@ export function PlayScreen({
 
     const image = new Image();
     image.decoding = "async";
+    // Storage serves the pictures from another origin. Asking for them
+    // anonymously keeps the canvas untainted, which matters because the engine
+    // draws every piece through offscreen canvases.
+    image.crossOrigin = "anonymous";
 
     const start = () => {
       if (cancelled) return;
