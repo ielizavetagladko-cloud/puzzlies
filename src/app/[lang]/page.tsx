@@ -6,14 +6,16 @@ import { ContinueCard } from "@/components/home/continue-card";
 import { StatsRow } from "@/components/home/stats";
 import { PuzzleCard } from "@/components/puzzle-card";
 import { buttonClass } from "@/components/ui/button";
-import { accentClasses, categories, puzzles, puzzlesOf } from "@/data/catalog";
+import { accentClasses } from "@/data/catalog";
 import { isLocale, t } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { getCatalogue } from "@/lib/catalogue";
 
 export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const dict = await getDictionary(lang);
+  const { categories, puzzles } = await getCatalogue();
 
   const freePuzzles = puzzles.filter((puzzle) => puzzle.access === "free");
 
@@ -83,7 +85,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           {categories.map((category) => {
-            const list = puzzlesOf(category.id);
+            const list = puzzles.filter((puzzle) => puzzle.categoryId === category.id);
             const accent = accentClasses[category.accent];
             return (
               <Link

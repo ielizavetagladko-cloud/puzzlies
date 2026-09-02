@@ -8,9 +8,11 @@ import "../globals.css";
 import { BottomNav } from "@/components/site/bottom-nav";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
+import { CatalogueProvider } from "@/data/catalogue-provider";
 import { defaultLocale, isLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { I18nProvider } from "@/i18n/provider";
+import { getCatalogue } from "@/lib/catalogue";
 import { googleSiteVerification, siteUrl } from "@/lib/site";
 
 const display = Comfortaa({
@@ -32,6 +34,12 @@ const themeScript = `(function(){try{var t=localStorage.getItem("puzzlies.theme"
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
+
+/**
+ * Pages are prerendered but refreshed every five minutes, so a picture added to
+ * the database shows up on its own — no rebuild, no deploy.
+ */
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Promise<Metadata> {
   const { lang } = await params;
@@ -71,6 +79,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   if (!isLocale(lang)) notFound();
 
   const dict = await getDictionary(lang);
+  const { categories, puzzles } = await getCatalogue();
 
   return (
     <html
@@ -86,11 +95,13 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           {themeScript}
         </Script>
         <I18nProvider dict={dict} locale={lang}>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-          <div className="pb-28 md:pb-0" />
-          <BottomNav />
+          <CatalogueProvider categories={categories} puzzles={puzzles}>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+            <div className="pb-28 md:pb-0" />
+            <BottomNav />
+          </CatalogueProvider>
         </I18nProvider>
       </body>
     </html>

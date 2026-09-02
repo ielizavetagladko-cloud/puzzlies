@@ -7,7 +7,8 @@ import { useState } from "react";
 import { SignInPanel } from "@/components/auth/sign-in-panel";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
-import { getCategory, type Puzzle } from "@/data/catalog";
+import type { Puzzle } from "@/data/catalog";
+import { useCatalogue } from "@/data/catalogue-provider";
 import { fmt, t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { useAuth } from "@/lib/auth";
@@ -18,6 +19,7 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
   const { dict, locale } = useI18n();
   const { state, ready, source, isUnlocked, unlockWithPoints, purchase } = useGame();
   const { user, ready: authReady } = useAuth();
+  const { getCategory } = useCatalogue();
 
   const [difficulty, setDifficulty] = useState<DifficultyId>("medium");
   const [dialog, setDialog] = useState<"unlock" | "buy" | null>(null);

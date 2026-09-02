@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { PlayScreen } from "@/components/puzzle/play-screen";
-import { getPuzzle } from "@/data/catalog";
 import { isLocale } from "@/i18n/config";
+import { getPuzzleById } from "@/lib/catalogue";
 import { getDifficulty } from "@/lib/points";
 
 // The board is an application screen, not a page worth indexing.
@@ -13,7 +13,7 @@ export default async function PlayPage({ params, searchParams }: PageProps<"/[la
   const query = await searchParams;
   if (!isLocale(lang)) notFound();
 
-  const puzzle = getPuzzle(id);
+  const puzzle = await getPuzzleById(id);
   if (!puzzle) notFound();
 
   const raw = Array.isArray(query.d) ? query.d[0] : query.d;

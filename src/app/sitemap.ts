@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
-import { categories, puzzles } from "@/data/catalog";
 import { defaultLocale, locales } from "@/i18n/config";
+import { getCatalogue } from "@/lib/catalogue";
 import { absolute } from "@/lib/site";
 
 /**
@@ -9,7 +9,10 @@ import { absolute } from "@/lib/site";
  * translation so Google serves the right one rather than treating the two as
  * duplicates of each other.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { categories, puzzles } = await getCatalogue();
   const paths: { path: string; priority: number }[] = [
     { path: "", priority: 1 },
     ...categories.map((category) => ({

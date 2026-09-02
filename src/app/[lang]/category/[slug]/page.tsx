@@ -2,21 +2,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PuzzleCard } from "@/components/puzzle-card";
-import { accentClasses, categories, getCategory, puzzlesOf } from "@/data/catalog";
+import { accentClasses } from "@/data/catalog";
 import { fmt, isLocale, locales, t } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { getCatalogue, getCategoryBySlug, getPuzzlesOf } from "@/lib/catalogue";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { categories } = await getCatalogue();
   return locales.flatMap((lang) => categories.map((category) => ({ lang, slug: category.slug })));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/category/[slug]">) {
   const { lang, slug } = await params;
-  const category = getCategory(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category || !isLocale(lang)) return {};
 
   const dict = await getDictionary(lang);
-  const list = puzzlesOf(category.id);
+  const list = await getPuzzlesOf(category.id);
   const description = fmt(dict.seo.category, {
     blurb: t(category.blurb, lang),
     n: list.length,
@@ -43,11 +45,11 @@ export default async function CategoryPage({ params }: PageProps<"/[lang]/catego
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
 
-  const category = getCategory(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
   const dict = await getDictionary(lang);
-  const list = puzzlesOf(category.id);
+  const list = await getPuzzlesOf(category.id);
   const accent = accentClasses[category.accent];
 
   return (

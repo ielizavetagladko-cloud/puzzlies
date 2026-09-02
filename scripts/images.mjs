@@ -35,6 +35,45 @@ const EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".tif", "
 
 const ACCENTS = ["mint", "sky", "lilac", "peach", "blush"];
 
+// ------------------------------------------------------------------ supabase
+
+/** Reads .env.local without pulling in a dependency just for that. */
+async function readEnv() {
+  const env = {};
+  try {
+    const raw = await readFile(path.join(ROOT, ".env.local"), "utf8");
+    for (const line of raw.split("\n")) {
+      const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (match) env[match[1]] = match[2].replace(/^["']|["']$/g, "");
+    }
+  } catch {
+    /* no .env.local — the catalogue is written to disk only */
+  }
+  return env;
+}
+
+/**
+ * Writes rows straight into Supabase.
+ *
+ * Needs the service key, because the catalogue tables are read-only to everyone
+ * else — which is the point: prices live where the browser cannot reach them.
+ */
+async function upsert(env, table, rows) {
+  const response = await fetch(`${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST",
+    headers: {
+      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(rows),
+  });
+  if (!response.ok) {
+    throw new Error(`${table}: ${response.status} ${await response.text()}`);
+  }
+}
+
 // --------------------------------------------------------------------- utils
 
 const say = (...parts) => console.log(...parts);
@@ -302,12 +341,61 @@ async function apply() {
   }
 
   await writeJson(CATALOG, catalog);
-
   say(`\nКаталог оновлено: ${catalog.puzzles.length} пазлів, ${catalog.categories.length} категорій.`);
+
+  const env = await readEnv();
+  const canWrite = env.SUPABASE_SERVICE_ROLE_KEY && env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (canWrite) {
+    try {
+      await upsert(
+        env,
+        "categories",
+        catalog.categories.map((category, index) => ({
+          id: category.id,
+          title_uk: category.title.uk,
+          title_en: category.title.en,
+          blurb_uk: category.blurb?.uk ?? "",
+          blurb_en: category.blurb?.en ?? "",
+          icon: category.icon ?? "🧩",
+          accent: category.accent ?? "mint",
+          sort_order: index,
+        })),
+      );
+      await upsert(
+        env,
+        "puzzles",
+        catalog.puzzles.map((puzzle, index) => ({
+          id: puzzle.id,
+          category_id: puzzle.categoryId,
+          title_uk: puzzle.title.uk,
+          title_en: puzzle.title.en,
+          image: puzzle.image,
+          width: puzzle.width,
+          height: puzzle.height,
+          access: puzzle.access,
+          points_cost: puzzle.pointsCost ?? null,
+          price_cents: puzzle.priceCents ?? null,
+          license: puzzle.license ?? "demo",
+          sort_order: index,
+          is_active: true,
+        })),
+      );
+      say("✓ база оновлена — SQL вручну запускати не треба");
+      say("\nЩо далі: «4-publish.command», щоб файли картинок потрапили на сайт.\n");
+      return;
+    } catch (error) {
+      warn(`не вдалося записати в базу: ${error.message}`);
+      warn("каталог на диску оновлено — далі старим способом, через SQL");
+    }
+  } else {
+    warn("немає SUPABASE_SERVICE_ROLE_KEY у .env.local — записати в базу не можу");
+  }
+
   say("\nЩо далі:");
   say("  1. npm run seed          — оновити supabase/seed.sql");
   say("  2. запустіть seed.sql у SQL Editor Supabase");
-  say("  3. git add -A && git commit && git push   — картинки лежать у репозиторії\n");
+  say("  3. «4-publish.command» — викласти картинки на сайт\n");
 }
 
 // ---------------------------------------------------------------------- main

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PuzzleCard } from "@/components/puzzle-card";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
-import { getPuzzle, puzzles } from "@/data/catalog";
+import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { useAuth } from "@/lib/auth";
@@ -16,6 +16,7 @@ export function ProfileView() {
   const { dict, locale } = useI18n();
   const { state, ready, source, isUnlocked, reset } = useGame();
   const { user, signOut } = useAuth();
+  const { puzzles, getPuzzle } = useCatalogue();
 
   const solvedCount = Object.values(state.solved).reduce((sum, record) => sum + record.count, 0);
   const collection = puzzles.filter((puzzle) => puzzle.access !== "free" && isUnlocked(puzzle));

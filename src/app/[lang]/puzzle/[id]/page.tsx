@@ -1,17 +1,18 @@
 import { notFound } from "next/navigation";
 
 import { PuzzleDetail } from "@/components/puzzle/puzzle-detail";
-import { getPuzzle, puzzles } from "@/data/catalog";
 import { fmt, isLocale, locales, t } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { getCatalogue, getPuzzleById } from "@/lib/catalogue";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { puzzles } = await getCatalogue();
   return locales.flatMap((lang) => puzzles.map((puzzle) => ({ lang, id: puzzle.id })));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/puzzle/[id]">) {
   const { lang, id } = await params;
-  const puzzle = getPuzzle(id);
+  const puzzle = await getPuzzleById(id);
   if (!puzzle || !isLocale(lang)) return {};
 
   const dict = await getDictionary(lang);
@@ -37,7 +38,7 @@ export default async function PuzzlePage({ params }: PageProps<"/[lang]/puzzle/[
   const { lang, id } = await params;
   if (!isLocale(lang)) notFound();
 
-  const puzzle = getPuzzle(id);
+  const puzzle = await getPuzzleById(id);
   if (!puzzle) notFound();
 
   return <PuzzleDetail puzzle={puzzle} />;

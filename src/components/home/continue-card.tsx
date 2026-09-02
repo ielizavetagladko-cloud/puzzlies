@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { buttonClass } from "@/components/ui/button";
-import { getPuzzle } from "@/data/catalog";
+import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { getDifficulty } from "@/lib/points";
@@ -13,6 +13,7 @@ import { useGame } from "@/lib/progress";
 export function ContinueCard() {
   const { dict, locale } = useI18n();
   const { state, ready } = useGame();
+  const { getPuzzle } = useCatalogue();
 
   if (!ready || !state.lastPlayed) return null;
 

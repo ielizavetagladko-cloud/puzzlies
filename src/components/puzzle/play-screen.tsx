@@ -7,7 +7,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Confetti } from "@/components/puzzle/confetti";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
-import { nextPuzzle, type Puzzle } from "@/data/catalog";
+import type { Puzzle } from "@/data/catalog";
+import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { formatSeconds, getDifficulty, type DifficultyId } from "@/lib/points";
@@ -28,6 +29,7 @@ export function PlayScreen({
   const { dict, locale } = useI18n();
   const { ready, isUnlocked, registerCompletion, rememberLastPlayed } = useGame();
   const router = useRouter();
+  const { nextPuzzle } = useCatalogue();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PuzzleEngine | null>(null);
@@ -44,7 +46,7 @@ export function PlayScreen({
 
   const difficulty = getDifficulty(difficultyId);
   const key = boardKey(puzzle.id, difficulty.id);
-  const following = nextPuzzle(puzzle);
+  const following = nextPuzzle(puzzle) ?? puzzle;
 
   // Locked pictures are not playable — bounce back to the detail page.
   useEffect(() => {
