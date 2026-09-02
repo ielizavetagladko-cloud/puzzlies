@@ -5,7 +5,8 @@ insert into public.categories (id, title_uk, title_en, blurb_uk, blurb_en, icon,
   ('nature', 'Природа', 'Nature', 'Поля, квіти й тепле світло', 'Fields, flowers and warm light', '🌿', 'mint', 0),
   ('water', 'Вода', 'Water', 'Море, озера й краплі', 'Seas, lakes and droplets', '🌊', 'sky', 1),
   ('mountains', 'Гори і небо', 'Peaks & sky', 'Туман, зорі та висота', 'Mist, stars and altitude', '🏔️', 'lilac', 2),
-  ('city', 'Місто і ретро', 'City & retro', 'Вулиці, авто й вогні', 'Streets, cars and lights', '🚗', 'peach', 3)
+  ('city', 'Місто і ретро', 'City & retro', 'Вулиці, авто й вогні', 'Streets, cars and lights', '🚗', 'peach', 3),
+  ('art', 'Мистецтво', 'Art', 'Класика з музейних колекцій', 'Classics from museum collections', '🎨', 'blush', 4)
 on conflict (id) do update set
   title_uk = excluded.title_uk,
   title_en = excluded.title_en,
@@ -48,7 +49,8 @@ insert into public.puzzles (id, category_id, title_uk, title_en, image, width, h
   ('city-dreamcatcher', 'city', 'Ловець снів', 'Dreamcatcher', '/puzzles/104.jpg', 1200, 900, 'points', 300, null, 'demo', 29),
   ('city-crowd', 'city', 'Вогні концерту', 'Concert lights', '/puzzles/117.jpg', 1200, 900, 'points', 380, null, 'demo', 30),
   ('city-bench', 'city', 'На лавці', 'On the bench', '/puzzles/129.jpg', 1200, 900, 'paid', null, 125, 'demo', 31),
-  ('city-tunnel', 'city', 'Світло в тунелі', 'Light in the tunnel', '/puzzles/137.jpg', 1200, 900, 'paid', null, 125, 'demo', 32)
+  ('city-tunnel', 'city', 'Світло в тунелі', 'Light in the tunnel', '/puzzles/137.jpg', 1200, 900, 'paid', null, 125, 'demo', 32),
+  ('art-the-harvesters', 'art', 'Жнива', 'The Harvesters', '/puzzles/art-the-harvesters.jpg', 2400, 1800, 'points', 200, null, 'public-domain', 33)
 on conflict (id) do update set
   category_id = excluded.category_id,
   title_uk = excluded.title_uk,

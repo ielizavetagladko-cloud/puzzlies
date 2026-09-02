@@ -55,6 +55,20 @@
       },
       "icon": "🚗",
       "accent": "peach"
+    },
+    {
+      "id": "art",
+      "slug": "art",
+      "title": {
+        "uk": "Мистецтво",
+        "en": "Art"
+      },
+      "blurb": {
+        "uk": "Класика з музейних колекцій",
+        "en": "Classics from museum collections"
+      },
+      "icon": "🎨",
+      "accent": "blush"
     }
   ],
   "puzzles": [
@@ -477,6 +491,20 @@
       "height": 900,
       "access": "paid",
       "priceCents": 125
+    },
+    {
+      "id": "art-the-harvesters",
+      "categoryId": "art",
+      "title": {
+        "uk": "Жнива",
+        "en": "The Harvesters"
+      },
+      "image": "/puzzles/art-the-harvesters.jpg",
+      "width": 2400,
+      "height": 1800,
+      "access": "points",
+      "pointsCost": 200,
+      "license": "public-domain"
     }
   ]
 }

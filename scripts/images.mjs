@@ -118,6 +118,21 @@ async function scan() {
   const knownCategories = new Set(catalog.categories.map((category) => category.id));
   const takenIds = new Set(catalog.puzzles.map((puzzle) => puzzle.id));
 
+  // A picture that moved to another folder is still the same picture, so it is
+  // matched by name as well as by path — otherwise renaming a category folder
+  // would silently throw away the titles and prices already filled in.
+  const byFile = new Map(previous.items.map((item) => [item.file, item]));
+  const basenameCounts = new Map();
+  for (const item of previous.items) {
+    const name = path.basename(item.file);
+    basenameCounts.set(name, (basenameCounts.get(name) ?? 0) + 1);
+  }
+  const byBasename = new Map(
+    previous.items
+      .filter((item) => basenameCounts.get(path.basename(item.file)) === 1)
+      .map((item) => [path.basename(item.file), item]),
+  );
+
   const items = [];
   const newCategories = [...previous.categories];
 
@@ -127,7 +142,8 @@ async function scan() {
     const relative = path.relative(INCOMING, file);
     const folder = path.dirname(relative).split(path.sep)[0];
     const category = folder === "." ? "" : folder;
-    const kept = previous.items.find((item) => item.file === relative);
+    const kept = byFile.get(relative) ?? byBasename.get(path.basename(relative));
+    const moved = kept && kept.file !== relative;
 
     let meta;
     try {
@@ -162,18 +178,32 @@ async function scan() {
           accent: ACCENTS[newCategories.length % ACCENTS.length],
         });
       }
-      warnings.push(`нова категорія «${category}» — заповніть її назву в plan.json`);
+      const declared = newCategories.find((item) => item.id === category);
+      const named = declared && declared.title?.uk?.trim() && declared.title.uk !== category;
+      if (!named) {
+        warnings.push(`нова категорія «${category}» — заповніть її назву в plan.json`);
+      } else {
+        say(`     нова категорія «${declared.title.uk}» буде створена`);
+      }
     }
     if (!category) warnings.push("файл лежить не в теці категорії");
 
     const title = titleFromFile(relative);
     let id = kept?.id ?? `${category || "puzzle"}-${slugify(title)}`;
+    // The id becomes both the file name and the public URL, so an id still
+    // carrying a different category is corrected now rather than living on
+    // forever. The prefix is compared against the categories that exist, since
+    // the plan's own category may already have been edited by hand.
+    const prefix = [...knownCategories, ...newCategories.map((item) => item.id)].find(
+      (name) => name !== category && id.startsWith(`${name}-`),
+    );
+    if (category && prefix) id = `${category}-${id.slice(prefix.length + 1)}`;
     while (!kept && (takenIds.has(id) || items.some((item) => item.id === id))) id = `${id}-2`;
 
     items.push({
       file: relative,
       id,
-      category: kept?.category ?? category,
+      category,
       title: kept?.title ?? { uk: title, en: title },
       access: kept?.access ?? "points",
       pointsCost: kept?.pointsCost ?? 200,
@@ -185,6 +215,7 @@ async function scan() {
     });
 
     say(`${warnings.length ? "•" : "✓"} ${relative}  →  ${id}  (${meta.width}×${meta.height})`);
+    if (moved) say(`     перенесено з ${kept.file} — ваші правки збережено`);
     warnings.forEach((message) => warn(message));
   }
 
@@ -218,6 +249,12 @@ async function apply() {
 
   const categoryIds = new Set(catalog.categories.map((category) => category.id));
   for (const item of items) {
+    if (!existsSync(path.join(INCOMING, item.file))) {
+      fail(
+        `Файла «${item.file}» більше немає — його перейменували або перенесли.\n` +
+          "  Запустіть `npm run images:scan` ще раз: план оновиться, а ваші правки збережуться.",
+      );
+    }
     if (!categoryIds.has(item.category)) {
       fail(`«${item.file}»: невідома категорія «${item.category}».`);
     }
