@@ -11,7 +11,7 @@ import { SiteHeader } from "@/components/site/header";
 import { defaultLocale, isLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { I18nProvider } from "@/i18n/provider";
-import { siteUrl } from "@/lib/site";
+import { googleSiteVerification, siteUrl } from "@/lib/site";
 
 const display = Comfortaa({
   variable: "--font-comfortaa",
@@ -62,6 +62,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       images: [{ url: "/puzzles/106.jpg", width: 1200, height: 900, alt: dict.common.appName }],
     },
     twitter: { card: "summary_large_image" },
+    verification: { google: googleSiteVerification },
   };
 }
 

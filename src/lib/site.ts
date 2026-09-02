@@ -15,3 +15,9 @@ export const siteUrl = (fromEnv ?? "https://puzzlies.vercel.app").replace(/\/$/,
 export function absolute(path: string) {
   return `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/**
+ * Google Search Console ownership token. Public by design — it is rendered
+ * into every page's head, and it only proves who controls this site.
+ */
+export const googleSiteVerification = "QrIaMPDmKV0JsbJldsjCQKHv5aSUsPzmXneUL0yeIbM";
