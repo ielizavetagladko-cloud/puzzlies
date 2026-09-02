@@ -5,6 +5,9 @@ import { getPuzzle } from "@/data/catalog";
 import { isLocale } from "@/i18n/config";
 import { getDifficulty } from "@/lib/points";
 
+// The board is an application screen, not a page worth indexing.
+export const metadata = { robots: { index: false, follow: true } };
+
 export default async function PlayPage({ params, searchParams }: PageProps<"/[lang]/play/[id]">) {
   const { lang, id } = await params;
   const query = await searchParams;

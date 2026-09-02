@@ -3,11 +3,40 @@ import { notFound } from "next/navigation";
 
 import { PuzzleCard } from "@/components/puzzle-card";
 import { accentClasses, categories, getCategory, puzzlesOf } from "@/data/catalog";
-import { isLocale, locales, t } from "@/i18n/config";
+import { fmt, isLocale, locales, t } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 
 export function generateStaticParams() {
   return locales.flatMap((lang) => categories.map((category) => ({ lang, slug: category.slug })));
+}
+
+export async function generateMetadata({ params }: PageProps<"/[lang]/category/[slug]">) {
+  const { lang, slug } = await params;
+  const category = getCategory(slug);
+  if (!category || !isLocale(lang)) return {};
+
+  const dict = await getDictionary(lang);
+  const list = puzzlesOf(category.id);
+  const description = fmt(dict.seo.category, {
+    blurb: t(category.blurb, lang),
+    n: list.length,
+  });
+
+  return {
+    title: t(category.title, lang),
+    description,
+    alternates: {
+      canonical: `/${lang}/category/${slug}`,
+      languages: Object.fromEntries(
+        locales.map((item) => [item, `/${item}/category/${slug}`]),
+      ),
+    },
+    openGraph: {
+      title: t(category.title, lang),
+      description,
+      images: list[0] ? [{ url: list[0].image, width: 1200, height: 900 }] : undefined,
+    },
+  };
 }
 
 export default async function CategoryPage({ params }: PageProps<"/[lang]/category/[slug]">) {

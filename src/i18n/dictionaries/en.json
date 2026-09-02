@@ -150,5 +150,10 @@
     "replay": "Solved again",
     "unlock": "Picture unlocked",
     "welcome": "Welcome bonus"
+  },
+  "seo": {
+    "site": "Puzzlies — jigsaw puzzles in your browser: solve pictures, earn points and unlock new ones. Free, no sign-up, on phone and desktop.",
+    "puzzle": "Solve the “{title}” jigsaw online — 12, 48, 108 or 300 pieces. Right in your browser, no sign-up.",
+    "category": "{blurb}. {n} jigsaw puzzles to solve free in your browser."
   }
 }

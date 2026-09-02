@@ -8,9 +8,10 @@ import "../globals.css";
 import { BottomNav } from "@/components/site/bottom-nav";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
-import { isLocale, locales } from "@/i18n/config";
+import { defaultLocale, isLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { I18nProvider } from "@/i18n/provider";
+import { siteUrl } from "@/lib/site";
 
 const display = Comfortaa({
   variable: "--font-comfortaa",
@@ -34,10 +35,33 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(isLocale(lang) ? lang : "uk");
+  const locale = isLocale(lang) ? lang : defaultLocale;
+  const dict = await getDictionary(locale);
+
   return {
-    title: dict.common.appName,
-    description: dict.common.tagline,
+    // Absolute URLs are built from here, so social previews and canonical tags
+    // point at the real site rather than at whichever deployment rendered them.
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: dict.common.appName,
+      template: `%s · ${dict.common.appName}`,
+    },
+    description: dict.seo.site,
+    applicationName: dict.common.appName,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: Object.fromEntries(locales.map((item) => [item, `/${item}`])),
+    },
+    openGraph: {
+      type: "website",
+      siteName: dict.common.appName,
+      title: dict.home.heroTitle,
+      description: dict.seo.site,
+      url: `/${locale}`,
+      locale: locale === "uk" ? "uk_UA" : "en_US",
+      images: [{ url: "/puzzles/106.jpg", width: 1200, height: 900, alt: dict.common.appName }],
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 
