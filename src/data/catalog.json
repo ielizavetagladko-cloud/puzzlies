@@ -505,6 +505,19 @@
       "access": "points",
       "pointsCost": 200,
       "license": "public-domain"
+    },
+    {
+      "id": "art-the-love-song",
+      "categoryId": "art",
+      "title": {
+        "uk": "Мелодія кохання",
+        "en": "The Love Song"
+      },
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-love-song.jpg",
+      "width": 2400,
+      "height": 1800,
+      "access": "free",
+      "license": "public-domain"
     }
   ]
 }
