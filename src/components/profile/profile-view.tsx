@@ -14,7 +14,7 @@ import { useGame } from "@/lib/progress";
 
 export function ProfileView() {
   const { dict, locale } = useI18n();
-  const { state, ready, isUnlocked, reset } = useGame();
+  const { state, ready, source, isUnlocked, reset } = useGame();
   const { user, signOut } = useAuth();
 
   const solvedCount = Object.values(state.solved).reduce((sum, record) => sum + record.count, 0);
@@ -140,14 +140,18 @@ export function ProfileView() {
         </div>
       </section>
 
-      <Button
-        variant="danger"
-        onClick={() => {
-          if (window.confirm(dict.profile.resetConfirm)) reset();
-        }}
-      >
-        {dict.profile.reset}
-      </Button>
+      {source === "account" ? (
+        <p className="text-sm text-pretty text-ink-soft">{dict.profile.deleteNote}</p>
+      ) : (
+        <Button
+          variant="danger"
+          onClick={() => {
+            if (window.confirm(dict.profile.resetConfirm)) reset();
+          }}
+        >
+          {dict.profile.reset}
+        </Button>
+      )}
     </div>
   );
 }

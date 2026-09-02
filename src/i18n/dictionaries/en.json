@@ -98,7 +98,8 @@
     "buyTitle": "Buy this picture",
     "mockNotice": "Test payment: no real money is charged.",
     "confirm": "Confirm purchase",
-    "success": "Thank you! The picture is unlocked."
+    "success": "Thank you! The picture is unlocked.",
+    "notAvailable": "Payment is not connected yet — it arrives with Stripe. For now, unlock pictures with points."
   },
   "auth": {
     "signIn": "Sign in",
@@ -143,13 +144,16 @@
     "history": "Points history",
     "historyEmpty": "Empty for now — solve your first puzzle!",
     "reset": "Reset progress",
-    "resetConfirm": "Really reset all progress and points?"
+    "resetConfirm": "Really reset all progress and points?",
+    "deleteNote": "To delete your account and all its data, write to the address in the privacy policy."
   },
   "reason": {
     "complete": "Puzzle solved",
     "replay": "Solved again",
     "unlock": "Picture unlocked",
-    "welcome": "Welcome bonus"
+    "welcome": "Welcome bonus",
+    "guest": "Guest progress",
+    "refund": "Refund"
   },
   "seo": {
     "site": "Puzzlies — jigsaw puzzles in your browser: solve pictures, earn points and unlock new ones. Free, no sign-up, on phone and desktop.",

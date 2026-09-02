@@ -16,7 +16,7 @@ import { useGame } from "@/lib/progress";
 
 export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
   const { dict, locale } = useI18n();
-  const { state, ready, isUnlocked, unlockWithPoints, purchase } = useGame();
+  const { state, ready, source, isUnlocked, unlockWithPoints, purchase } = useGame();
   const { user, ready: authReady } = useAuth();
 
   const [difficulty, setDifficulty] = useState<DifficultyId>("medium");
@@ -219,7 +219,11 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                   {t(puzzle.title, locale)}
                 </p>
 
-                {dialog === "unlock" ? (
+                {dialog === "buy" && source === "account" ? (
+                  <p className="rounded-2xl bg-lemon/60 px-3 py-2 text-sm text-pretty text-ink">
+                    ⏳ {dict.shop.notAvailable}
+                  </p>
+                ) : dialog === "unlock" ? (
                   <p className="inline-flex items-center gap-1.5 text-sm text-ink-soft">
                     {dict.unlock.cost}: <CoinIcon className="size-4" />
                     <span className="font-display font-bold text-ink">{cost}</span>
@@ -244,14 +248,16 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                   >
                     {dict.common.cancel}
                   </Button>
-                  <Button
-                    variant={dialog === "unlock" ? "coin" : "primary"}
-                    className="flex-1"
-                    disabled={busy}
-                    onClick={dialog === "unlock" ? confirmUnlock : confirmPurchase}
-                  >
-                    {dialog === "unlock" ? dict.unlock.confirm : dict.shop.confirm}
-                  </Button>
+                  {!(dialog === "buy" && source === "account") && (
+                    <Button
+                      variant={dialog === "unlock" ? "coin" : "primary"}
+                      className="flex-1"
+                      disabled={busy}
+                      onClick={dialog === "unlock" ? confirmUnlock : confirmPurchase}
+                    >
+                      {dialog === "unlock" ? dict.unlock.confirm : dict.shop.confirm}
+                    </Button>
+                  )}
                 </div>
               </>
             )}
