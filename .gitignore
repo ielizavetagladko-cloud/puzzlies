@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code local state
 .claude/settings.local.json
+
+# working files for the image pipeline
+/content/

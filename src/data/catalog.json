@@ -1,0 +1,482 @@
+{
+  "categories": [
+    {
+      "id": "nature",
+      "slug": "nature",
+      "title": {
+        "uk": "Природа",
+        "en": "Nature"
+      },
+      "blurb": {
+        "uk": "Поля, квіти й тепле світло",
+        "en": "Fields, flowers and warm light"
+      },
+      "icon": "🌿",
+      "accent": "mint"
+    },
+    {
+      "id": "water",
+      "slug": "water",
+      "title": {
+        "uk": "Вода",
+        "en": "Water"
+      },
+      "blurb": {
+        "uk": "Море, озера й краплі",
+        "en": "Seas, lakes and droplets"
+      },
+      "icon": "🌊",
+      "accent": "sky"
+    },
+    {
+      "id": "mountains",
+      "slug": "mountains",
+      "title": {
+        "uk": "Гори і небо",
+        "en": "Peaks & sky"
+      },
+      "blurb": {
+        "uk": "Туман, зорі та висота",
+        "en": "Mist, stars and altitude"
+      },
+      "icon": "🏔️",
+      "accent": "lilac"
+    },
+    {
+      "id": "city",
+      "slug": "city",
+      "title": {
+        "uk": "Місто і ретро",
+        "en": "City & retro"
+      },
+      "blurb": {
+        "uk": "Вулиці, авто й вогні",
+        "en": "Streets, cars and lights"
+      },
+      "icon": "🚗",
+      "accent": "peach"
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "nature-blossom",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Весняне цвітіння",
+        "en": "Spring blossom"
+      },
+      "image": "/puzzles/106.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "nature-green-field",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Зелене поле",
+        "en": "Green field"
+      },
+      "image": "/puzzles/107.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "nature-garden",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Літній сад",
+        "en": "Summer garden"
+      },
+      "image": "/puzzles/127.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "nature-berries",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Малина на столі",
+        "en": "Berries on the table"
+      },
+      "image": "/puzzles/102.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 150
+    },
+    {
+      "id": "nature-morning",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Ранкова трава",
+        "en": "Morning grass"
+      },
+      "image": "/puzzles/109.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 200
+    },
+    {
+      "id": "nature-sunset",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Захід над полем",
+        "en": "Sunset over the field"
+      },
+      "image": "/puzzles/110.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 260
+    },
+    {
+      "id": "nature-wheat",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Колоски",
+        "en": "Wheat ears"
+      },
+      "image": "/puzzles/112.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 320
+    },
+    {
+      "id": "nature-tuscany",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Тосканська дорога",
+        "en": "Tuscan road"
+      },
+      "image": "/puzzles/116.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "nature-sunflower",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Соняшник",
+        "en": "Sunflower"
+      },
+      "image": "/puzzles/118.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "water-turquoise",
+      "categoryId": "water",
+      "title": {
+        "uk": "Бірюзове море",
+        "en": "Turquoise sea"
+      },
+      "image": "/puzzles/124.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "water-horizon",
+      "categoryId": "water",
+      "title": {
+        "uk": "Тиха гладь",
+        "en": "Calm horizon"
+      },
+      "image": "/puzzles/135.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "water-waves",
+      "categoryId": "water",
+      "title": {
+        "uk": "Хвилі",
+        "en": "Waves"
+      },
+      "image": "/puzzles/126.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 150
+    },
+    {
+      "id": "water-flight",
+      "categoryId": "water",
+      "title": {
+        "uk": "Політ над морем",
+        "en": "Flight over the sea"
+      },
+      "image": "/puzzles/130.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 220
+    },
+    {
+      "id": "water-droplets",
+      "categoryId": "water",
+      "title": {
+        "uk": "Краплі",
+        "en": "Droplets"
+      },
+      "image": "/puzzles/123.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 280
+    },
+    {
+      "id": "water-lake",
+      "categoryId": "water",
+      "title": {
+        "uk": "Озеро в горах",
+        "en": "Mountain lake"
+      },
+      "image": "/puzzles/128.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 340
+    },
+    {
+      "id": "water-rocky",
+      "categoryId": "water",
+      "title": {
+        "uk": "Скелястий берег",
+        "en": "Rocky shore"
+      },
+      "image": "/puzzles/132.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "water-shell",
+      "categoryId": "water",
+      "title": {
+        "uk": "Мушля",
+        "en": "Seashell"
+      },
+      "image": "/puzzles/139.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "mountains-misty",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Туманні пагорби",
+        "en": "Misty hills"
+      },
+      "image": "/puzzles/114.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "mountains-fog",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Гірський туман",
+        "en": "Mountain fog"
+      },
+      "image": "/puzzles/121.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "mountains-shore",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Береги озера",
+        "en": "Lake shores"
+      },
+      "image": "/puzzles/125.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 160
+    },
+    {
+      "id": "mountains-stone",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Камʼяні велетні",
+        "en": "Stone giants"
+      },
+      "image": "/puzzles/136.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 230
+    },
+    {
+      "id": "mountains-stars",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Зоряна ніч",
+        "en": "Starry night"
+      },
+      "image": "/puzzles/120.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 300
+    },
+    {
+      "id": "mountains-palm",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Пальма на світанку",
+        "en": "Palm at dawn"
+      },
+      "image": "/puzzles/108.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 360
+    },
+    {
+      "id": "mountains-ice",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Крижані краплі",
+        "en": "Frozen drops"
+      },
+      "image": "/puzzles/115.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "mountains-blue",
+      "categoryId": "mountains",
+      "title": {
+        "uk": "Синій вітер",
+        "en": "Blue wind"
+      },
+      "image": "/puzzles/113.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "city-retro-car",
+      "categoryId": "city",
+      "title": {
+        "uk": "Ретро авто",
+        "en": "Retro car"
+      },
+      "image": "/puzzles/133.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "city-pickup",
+      "categoryId": "city",
+      "title": {
+        "uk": "Старий пікап",
+        "en": "Old pickup"
+      },
+      "image": "/puzzles/111.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "free"
+    },
+    {
+      "id": "city-bridge",
+      "categoryId": "city",
+      "title": {
+        "uk": "Міст уночі",
+        "en": "Bridge at night"
+      },
+      "image": "/puzzles/122.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 170
+    },
+    {
+      "id": "city-arch",
+      "categoryId": "city",
+      "title": {
+        "uk": "Дерев'яна арка",
+        "en": "Wooden arch"
+      },
+      "image": "/puzzles/134.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 240
+    },
+    {
+      "id": "city-dreamcatcher",
+      "categoryId": "city",
+      "title": {
+        "uk": "Ловець снів",
+        "en": "Dreamcatcher"
+      },
+      "image": "/puzzles/104.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 300
+    },
+    {
+      "id": "city-crowd",
+      "categoryId": "city",
+      "title": {
+        "uk": "Вогні концерту",
+        "en": "Concert lights"
+      },
+      "image": "/puzzles/117.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "points",
+      "pointsCost": 380
+    },
+    {
+      "id": "city-bench",
+      "categoryId": "city",
+      "title": {
+        "uk": "На лавці",
+        "en": "On the bench"
+      },
+      "image": "/puzzles/129.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    },
+    {
+      "id": "city-tunnel",
+      "categoryId": "city",
+      "title": {
+        "uk": "Світло в тунелі",
+        "en": "Light in the tunnel"
+      },
+      "image": "/puzzles/137.jpg",
+      "width": 1200,
+      "height": 900,
+      "access": "paid",
+      "priceCents": 125
+    }
+  ]
+}
