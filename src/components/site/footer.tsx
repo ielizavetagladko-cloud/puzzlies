@@ -1,0 +1,38 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { useI18n } from "@/i18n/provider";
+
+export function SiteFooter() {
+  const { dict, locale } = useI18n();
+  const pathname = usePathname();
+
+  // The board takes over the whole screen.
+  if (pathname.includes("/play/")) return null;
+
+  const links = [
+    { href: `/${locale}/privacy`, label: dict.nav.privacy },
+    { href: `/${locale}/terms`, label: dict.nav.terms },
+  ];
+
+  return (
+    <footer className="border-t border-line/70 px-4 py-6 sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center">
+        <span className="font-display text-sm font-bold text-ink-soft">
+          🧩 {dict.common.appName}
+        </span>
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-sm text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    </footer>
+  );
+}

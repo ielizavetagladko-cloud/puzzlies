@@ -6,6 +6,7 @@ import Script from "next/script";
 import "../globals.css";
 
 import { BottomNav } from "@/components/site/bottom-nav";
+import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { isLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -61,7 +62,9 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         </Script>
         <I18nProvider dict={dict} locale={lang}>
           <SiteHeader />
-          <main className="flex-1 pb-28 md:pb-12">{children}</main>
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <div className="pb-28 md:pb-0" />
           <BottomNav />
         </I18nProvider>
       </body>

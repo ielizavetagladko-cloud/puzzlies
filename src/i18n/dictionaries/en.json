@@ -19,7 +19,9 @@
     "categories": "Categories",
     "profile": "Profile",
     "theme": "Theme",
-    "language": "Language"
+    "language": "Language",
+    "privacy": "Privacy",
+    "terms": "Terms of use"
   },
   "home": {
     "heroTitle": "Solve puzzles, unlock new worlds",
