@@ -31,9 +31,17 @@ export function difficultyLabel(dict: Dict, id: DifficultyId) {
   return dict.difficulty[id];
 }
 
-/** Points given for finishing a board. Replays are worth a fifth. */
+/**
+ * What a board is worth the second time round: a fifth, so the same easy
+ * picture cannot be farmed for points.
+ */
+export function replayReward(difficulty: Difficulty) {
+  return Math.max(1, Math.round(difficulty.reward * 0.2));
+}
+
+/** Points given for finishing a board. */
 export function computeReward(difficulty: Difficulty, seconds: number, firstTime: boolean) {
-  if (!firstTime) return Math.max(1, Math.round(difficulty.reward * 0.2));
+  if (!firstTime) return replayReward(difficulty);
 
   const speed = Math.max(0, Math.min(1, 1 - seconds / difficulty.parSeconds));
   return difficulty.reward + Math.round(difficulty.reward * 0.5 * speed);

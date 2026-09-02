@@ -55,7 +55,8 @@
     "lockedHint": "This picture is still locked",
     "paidOnly": "This picture is available by purchase only",
     "reward": "Reward",
-    "unlockedAt": "Unlocked"
+    "unlockedAt": "Unlocked",
+    "replay": "replay"
   },
   "difficulty": {
     "easy": "Easy",
@@ -84,7 +85,8 @@
     "newBest": "New record!",
     "again": "Play again",
     "toCategory": "Back to category",
-    "next": "Next puzzle"
+    "next": "Next puzzle",
+    "replayNote": "Replayed — a fifth of the full reward"
   },
   "unlock": {
     "title": "Unlock this picture?",

@@ -12,7 +12,13 @@ import { useCatalogue } from "@/data/catalogue-provider";
 import { fmt, t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { useAuth } from "@/lib/auth";
-import { DIFFICULTIES, formatPrice, formatSeconds, type DifficultyId } from "@/lib/points";
+import {
+  DIFFICULTIES,
+  formatPrice,
+  formatSeconds,
+  replayReward,
+  type DifficultyId,
+} from "@/lib/points";
 import { useGame } from "@/lib/progress";
 
 export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
@@ -98,6 +104,10 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                 <div className="grid grid-cols-2 gap-2">
                   {DIFFICULTIES.map((item) => {
                     const active = item.id === difficulty;
+                    // Already solved at this size? Then the honest number is
+                    // the replay reward, not the first-time one.
+                    const done = record?.best?.[item.id] !== undefined;
+                    const reward = done ? replayReward(item) : item.reward;
                     return (
                       <button
                         key={item.id}
@@ -116,7 +126,12 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                           {item.pieces} {dict.puzzle.pieces}
                         </span>
                         <span className="mt-1 inline-flex items-center gap-1 font-display text-xs font-bold text-coin-deep">
-                          <CoinIcon className="size-3.5" />+{item.reward}
+                          <CoinIcon className="size-3.5" />+{reward}
+                          {done && (
+                            <span className="font-normal text-ink-soft">
+                              · {dict.puzzle.replay}
+                            </span>
+                          )}
                         </span>
                       </button>
                     );

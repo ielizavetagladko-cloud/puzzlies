@@ -17,7 +17,7 @@ import { hashSeed } from "@/lib/puzzle/geometry";
 import { boardKey, clearBoard, loadBoard, saveBoard } from "@/lib/puzzle/storage";
 import { useGame } from "@/lib/progress";
 
-type Result = { seconds: number; earned: number; isBest: boolean };
+type Result = { seconds: number; earned: number; isBest: boolean; firstTime: boolean };
 
 export function PlayScreen({
   puzzle,
@@ -63,7 +63,12 @@ export function PlayScreen({
     completeRef.current = async (secs: number) => {
       clearBoard(key);
       const outcome = await registerCompletion(puzzle.id, difficulty.id, secs);
-      setResult({ seconds: secs, earned: outcome.earned, isBest: outcome.isBest });
+      setResult({
+        seconds: secs,
+        earned: outcome.earned,
+        isBest: outcome.isBest,
+        firstTime: outcome.firstTime,
+      });
     };
   }, [difficulty.id, key, puzzle.id, registerCompletion]);
 
@@ -259,6 +264,12 @@ export function PlayScreen({
 
               {result.isBest && (
                 <p className="font-display text-sm font-bold text-mint-ink">⭐ {dict.win.newBest}</p>
+              )}
+
+              {/* A smaller number than the puzzle page promised needs a reason
+                  given here, not left for the player to puzzle out. */}
+              {!result.firstTime && (
+                <p className="text-xs text-pretty text-ink-soft">↻ {dict.win.replayNote}</p>
               )}
 
               <div className="flex flex-col gap-4">
