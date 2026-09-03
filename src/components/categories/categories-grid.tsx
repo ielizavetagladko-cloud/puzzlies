@@ -18,7 +18,13 @@ export function CategoriesGrid({
   dict: Dict;
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    // Two columns and the thumbnail strip used to both switch on at the same
+    // 640px breakpoint, so a tablet-width card had to fit a title, a blurb,
+    // and three thumbnails in about 350px — titles wrapped three lines deep
+    // and ran into the thumbnails next to them. The grid now waits for lg
+    // (1024px), so every card stays full width — room for both — right up
+    // until there is genuinely space to split into two.
+    <div className="grid gap-3 lg:grid-cols-2">
       {categories.map((category) => {
         const list = puzzles.filter((puzzle) => puzzle.categoryId === category.id);
         const accent = accentClasses[category.accent];
