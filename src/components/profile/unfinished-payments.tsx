@@ -10,6 +10,7 @@ import {
   cancelPendingOrder,
   refreshPendingOrders,
   usePendingOrders,
+  useReturnedFromCheckout,
 } from "@/lib/payments/pending";
 import { formatPrice } from "@/lib/points";
 
@@ -25,9 +26,14 @@ export function UnfinishedPayments() {
   const { orders } = usePendingOrders();
   const [busy, setBusy] = useState<string | null>(null);
 
+  // Someone may finish a payment from here and come straight back. Watching for
+  // that both refreshes this list and stops a stale "you came back" greeting
+  // waiting to ambush them on the top-up page.
+  const returned = useReturnedFromCheckout();
+
   useEffect(() => {
     void refreshPendingOrders();
-  }, []);
+  }, [returned]);
 
   if (orders.length === 0) return null;
 

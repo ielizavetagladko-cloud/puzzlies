@@ -14,11 +14,14 @@ import type { PointPack } from "@/lib/packs";
 import { startCheckout } from "@/lib/payments/checkout-form";
 import {
   cancelPendingOrder,
+  clearReturnedFromCheckout,
+  readLatestOrder,
   readOrderStatus,
   refreshPendingOrders,
+  useReturnedFromCheckout,
 } from "@/lib/payments/pending";
 import { formatPrice, formatUnit } from "@/lib/points";
-import { useGame } from "@/lib/progress";
+import { reloadProgress, useGame } from "@/lib/progress";
 
 /** The newest unfinished payment, if there is one. */
 function unfinishedRefOf(orders: { ref: string }[]): string | null {
@@ -45,14 +48,50 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   const fromUrl: TopUpOutcome | null =
     raw === "ok" || raw === "cancelled" || raw === "failed" ? raw : raw === "pending" ? "unfinished" : null;
 
+  // The buyer is back from the payment page. They may have come by the
+  // provider's own return, or by the back button — which restores this page
+  // from the browser's cache exactly as it was, buttons still disabled and no
+  // parameter in the address to explain anything.
+  const returned = useReturnedFromCheckout();
+  const [afterReturn, setAfterReturn] = useState<TopUpOutcome | null>(null);
+
   // A payment we cannot confirm may still be on its way. The order is polled
   // for a short while, so a buyer who really did pay is congratulated rather
   // than asked whether they meant to give up.
   const [settled, setSettled] = useState<{ outcome: TopUpOutcome; points: number } | null>(null);
   const [unfinishedRef, setUnfinishedRef] = useState<string | null>(null);
 
-  const outcome = settled?.outcome ?? fromUrl;
+  const outcome = settled?.outcome ?? fromUrl ?? afterReturn;
   const granted = settled?.points ?? (Number(params.get("points")) || 0);
+
+  // A checkout that never came back left `busy` set. Coming back is the signal
+  // to let go of it — nothing else will.
+  const waiting = returned ? null : busy;
+
+  useEffect(() => {
+    if (!returned || fromUrl) return;
+
+    let live = true;
+    void (async () => {
+      const order = await readLatestOrder();
+      if (!live || !order) return;
+      if (order.status === "paid") {
+        // Paid while we were away, and the cached page still shows the old
+        // balance.
+        reloadProgress();
+        setSettled({ outcome: "ok", points: order.points });
+        return;
+      }
+      if (order.status === "pending") {
+        setUnfinishedRef(order.ref);
+        setAfterReturn("unfinished");
+      }
+    })();
+
+    return () => {
+      live = false;
+    };
+  }, [returned, fromUrl]);
 
   useEffect(() => {
     if (fromUrl !== "unfinished") return;
@@ -92,7 +131,9 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
 
   function closeDialog() {
     setDismissed(true);
-    router.replace(pathname, { scroll: false });
+    setAfterReturn(null);
+    clearReturnedFromCheckout();
+    if (raw) router.replace(pathname, { scroll: false });
   }
 
   async function abandon() {
@@ -105,6 +146,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
       closeDialog();
       return;
     }
+    setDismissed(true);
     setBusy(order.packId);
     const result = await startCheckout(order.packId, locale, order.ref);
     if (result !== "left") {
@@ -142,7 +184,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
           points={granted}
           onClose={closeDialog}
           {...(outcome === "unfinished"
-            ? { onResume: resume, onAbandon: abandon, busy: busy !== null }
+            ? { onResume: resume, onAbandon: abandon, busy: waiting !== null }
             : null)}
         />
       )}
@@ -187,7 +229,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
                 variant={best ? "primary" : "soft"}
                 size="lg"
                 className="w-full"
-                disabled={busy !== null || !authReady}
+                disabled={waiting !== null || !authReady}
                 onClick={() => buy(pack)}
               >
                 {formatPrice(pack.priceMinorUnits, pack.currency, locale)}

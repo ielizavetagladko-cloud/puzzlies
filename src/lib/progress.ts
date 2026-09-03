@@ -82,6 +82,8 @@ let snapshot: Snapshot = serverSnapshot;
 
 /** Which account the snapshot belongs to; null while playing as a guest. */
 let loadedFor: string | null | undefined = undefined;
+/** Who the store is currently holding progress for, so it can be re-read. */
+let currentUserId: string | null = null;
 
 const listeners = new Set<() => void>();
 
@@ -230,6 +232,18 @@ async function loadForUser(userId: string | null) {
   }
 }
 
+/**
+ * Re-reads the balance from the database.
+ *
+ * Needed after money is spent or earned somewhere this store cannot see — a
+ * payment finished on the provider's site, then the browser walked back into a
+ * page it had cached, balance and all.
+ */
+export function reloadProgress() {
+  loadedFor = undefined;
+  void loadForUser(currentUserId);
+}
+
 // -------------------------------------------------------------------- hook
 
 function subscribe(listener: () => void) {
@@ -261,6 +275,7 @@ export function useGame() {
 
   useEffect(() => {
     if (!authReady) return;
+    currentUserId = userId;
     void loadForUser(userId);
   }, [authReady, userId]);
 

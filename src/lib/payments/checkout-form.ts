@@ -1,5 +1,7 @@
 "use client";
 
+import { markCheckoutStarted } from "./pending";
+
 export type Checkout =
   | { kind: "redirect"; url: string }
   | { kind: "form"; url: string; fields: Record<string, string | string[]> };
@@ -62,6 +64,7 @@ export async function startCheckout(
     if (response.status === 409) return "already-paid";
     if (!response.ok) return "failed";
 
+    markCheckoutStarted();
     goToCheckout((await response.json()) as Checkout);
     return "left";
   } catch {
