@@ -176,6 +176,15 @@
     "success": "Thank you! Your points have been added.",
     "cancelled": "Payment cancelled — nothing was charged.",
     "pending": "Payment is being processed. Your points will appear in a few minutes.",
-    "topUp": "Top up"
+    "topUp": "Top up",
+    "okTitle": "More points for you",
+    "okBody": "They are in your balance already. Time to pick which picture opens first.",
+    "cancelledTitle": "Payment cancelled",
+    "cancelledBody": "Nothing was charged. Come back whenever you like.",
+    "pendingTitle": "Payment is going through",
+    "pendingBody": "Your points will appear in a few minutes. Solve something free meanwhile.",
+    "failedTitle": "Something went wrong",
+    "failedBody": "Nothing was charged. If it was, write to us and we will sort it out.",
+    "close": "Got it"
   }
 }

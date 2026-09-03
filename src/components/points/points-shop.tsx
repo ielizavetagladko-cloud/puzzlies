@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
+import { TopUpDialog, type TopUpOutcome } from "@/components/points/topup-dialog";
 
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
@@ -26,16 +28,23 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  // What the payment left behind in the URL on the way back.
-  const outcome = useSearchParams().get("topup");
-  const outcomeMessage =
-    outcome === "ok"
-      ? dict.packs.success
-      : outcome === "cancelled"
-        ? dict.packs.cancelled
-        : outcome === "pending"
-          ? dict.packs.pending
-          : null;
+  // What the payment left behind in the URL on the way back. It is dropped from
+  // the address as soon as it has been shown, so a reload does not congratulate
+  // the player a second time for the same purchase.
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const [dismissed, setDismissed] = useState(false);
+
+  const raw = params.get("topup");
+  const outcome: TopUpOutcome | null =
+    raw === "ok" || raw === "cancelled" || raw === "pending" || raw === "failed" ? raw : null;
+  const granted = Number(params.get("points")) || 0;
+
+  function closeDialog() {
+    setDismissed(true);
+    router.replace(pathname, { scroll: false });
+  }
 
   // The best rate on offer, so the strongest pack can be marked as such
   // instead of leaving the reader to divide in their head.
@@ -75,15 +84,8 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
 
   return (
     <div className="space-y-5">
-      {outcomeMessage && (
-        <p
-          className={`card-soft p-4 text-center text-sm text-pretty ${
-            outcome === "ok" ? "text-mint-ink" : "text-ink-soft"
-          }`}
-        >
-          {outcome === "ok" ? "🎉 " : ""}
-          {outcomeMessage}
-        </p>
+      {outcome && !dismissed && (
+        <TopUpDialog outcome={outcome} points={granted} onClose={closeDialog} />
       )}
 
       <div className="card-soft flex items-center justify-between gap-3 p-4">

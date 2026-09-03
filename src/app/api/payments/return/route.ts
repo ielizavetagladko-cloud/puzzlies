@@ -19,20 +19,26 @@ export async function GET(request: NextRequest) {
   const ref = request.nextUrl.searchParams.get("mock_ref");
 
   let outcome = "cancelled";
+  let points = 0;
 
   if (provider?.id === "mock" && ref) {
     const admin = getSupabaseAdminClient();
     if (admin) {
       const { data, error } = await admin.rpc("fulfil_order", { p_provider_ref: ref });
-      const result = (Array.isArray(data) ? data[0] : data) as { ok: boolean } | null;
+      const result = (Array.isArray(data) ? data[0] : data) as
+        | { ok: boolean; points_granted: number }
+        | null;
       outcome = !error && result?.ok ? "ok" : "failed";
+      points = result?.points_granted ?? 0;
     }
   } else if (ref) {
     outcome = "pending";
   }
 
   const lang = request.nextUrl.searchParams.get("lang") === "en" ? "en" : "uk";
-  return NextResponse.redirect(
-    new URL(`/${lang}/points?topup=${outcome}`, request.nextUrl.origin),
-  );
+  const back = new URL(`/${lang}/points`, request.nextUrl.origin);
+  back.searchParams.set("topup", outcome);
+  // The exact number makes the confirmation mean something.
+  if (points > 0) back.searchParams.set("points", String(points));
+  return NextResponse.redirect(back);
 }
