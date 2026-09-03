@@ -178,8 +178,17 @@ export async function saveLook(next: Partial<Look>): Promise<boolean> {
   if (next.avatar !== undefined) patch.avatar = next.avatar;
 
   // Only these two columns are writable by their owner; the balance is not.
-  const { error } = await supabase.from("profiles").update(patch).eq("id", auth.user.id);
-  if (error) return false;
+  //
+  // .select() matters here beyond returning the row: a row level security
+  // policy that silently matches nothing is not an error to PostgREST, so an
+  // update that touched zero rows would otherwise report success with nothing
+  // saved. That exact gap once let a player type a name that never stuck.
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(patch)
+    .eq("id", auth.user.id)
+    .select("id");
+  if (error || !data?.length) return false;
 
   look = { ...look, ...next, name: next.name === undefined ? look.name : next.name?.trim() || null };
   notifyName();
