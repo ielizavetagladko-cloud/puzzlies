@@ -27,11 +27,16 @@ alter table public.profiles
 revoke update on public.profiles from authenticated;
 grant update (display_name, avatar) on public.profiles to authenticated;
 
+-- The board gains a column, and Postgres will not let "create or replace"
+-- change what a function returns. Dropping first is the only way, and it takes
+-- the old grant with it — hence the grant again at the bottom.
+drop function if exists public.leaderboard(text, int);
+
 /**
  * The board again, now carrying whatever the player chose to be called and to
  * look like. Still no email, still no user id.
  */
-create or replace function public.leaderboard(p_difficulty text, p_limit int default 20)
+create function public.leaderboard(p_difficulty text, p_limit int default 20)
 returns table (
   place        bigint,
   handle       text,
