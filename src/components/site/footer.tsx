@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { PuzzleMark } from "@/components/site/logo";
 import { useI18n } from "@/i18n/provider";
 
 export function SiteFooter() {
@@ -25,8 +26,9 @@ export function SiteFooter() {
     // leave a gap of bare page background between the two.
     <footer className="border-t border-line/70 px-4 pt-6 pb-28 sm:px-6 md:pb-6">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center">
-        <span className="font-display text-sm font-bold text-ink-soft">
-          🧩 {dict.common.appName}
+        <span className="inline-flex items-center gap-1.5 font-display text-sm font-bold text-ink-soft">
+          <PuzzleMark className="size-4" />
+          {dict.common.appName}
         </span>
         {links.map((link) => (
           <Link
