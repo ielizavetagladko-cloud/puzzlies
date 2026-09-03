@@ -19,8 +19,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "not-configured" }, { status: 503 });
   }
 
+  // 503 is reserved for "no payment provider yet", which the page explains to
+  // the player. Anything else missing is our own server being misconfigured,
+  // and saying "payments are not connected" would send everyone looking in the
+  // wrong place — as it once did.
   const supabase = await getSupabaseServerClient();
-  if (!supabase) return NextResponse.json({ error: "not-configured" }, { status: 503 });
+  if (!supabase) return NextResponse.json({ error: "server-error" }, { status: 500 });
 
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest) {
   // Orders are written with the trusted key: a player must not be able to
   // invent one, or to name their own price on it.
   const admin = getSupabaseAdminClient();
-  if (!admin) return NextResponse.json({ error: "not-configured" }, { status: 503 });
+  if (!admin) return NextResponse.json({ error: "server-error" }, { status: 500 });
 
   const orderRef = randomUUID();
   const { error } = await admin.from("orders").insert({

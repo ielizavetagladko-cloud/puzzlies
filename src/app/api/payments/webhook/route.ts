@@ -29,8 +29,10 @@ export async function POST(request: NextRequest) {
     return acknowledge(result.reply);
   }
 
+  // Not 503: the provider must retry, because the payment itself was fine and
+  // it is this side that cannot record it.
   const admin = getSupabaseAdminClient();
-  if (!admin) return NextResponse.json({ error: "not-configured" }, { status: 503 });
+  if (!admin) return NextResponse.json({ error: "server-error" }, { status: 500 });
 
   const { data, error } = await admin.rpc("fulfil_order", { p_provider_ref: result.orderRef });
   const outcome = (Array.isArray(data) ? data[0] : data) as
