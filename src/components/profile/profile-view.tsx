@@ -8,6 +8,7 @@ import { CoinIcon } from "@/components/ui/coin";
 import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
+import { UnfinishedPayments } from "@/components/profile/unfinished-payments";
 import { useAuth } from "@/lib/auth";
 import { formatSeconds } from "@/lib/points";
 import { useGame } from "@/lib/progress";
@@ -111,6 +112,8 @@ export function ProfileView() {
           </div>
         )}
       </section>
+
+      <UnfinishedPayments />
 
       <section>
         <h2 className="mb-3 font-display text-xl font-bold text-ink">{dict.profile.history}</h2>

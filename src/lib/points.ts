@@ -61,25 +61,42 @@ export function formatSeconds(total: number) {
 
 /** Prices are always shown in dollars, so the US format reads the same in both languages. */
 /**
+ * How each currency is written.
+ *
+ * Ukrainian shops write "грн" rather than "₴"; to an English reader that says
+ * nothing, so there it stays the code the payment page itself shows.
+ */
+function currencyLabel(currency: string, locale: string): string {
+  if (currency === "UAH") return locale === "uk" ? "грн" : "UAH";
+  if (currency === "USD") return "$";
+  if (currency === "EUR") return "€";
+  return currency;
+}
+
+/**
  * A price in the currency it will actually be charged in.
  *
- * Whole hryvnia are written without kopiyky — "89 ₴" is how a price is written
- * in Ukraine, while "$2" is not how one is written in English.
+ * Written by hand rather than through Intl's currency display, because that
+ * display is not the same on both sides of the wire: Node renders UAH as "89 ₴"
+ * and browsers as "89 грн", from different ICU data. Identical code producing
+ * different text is a hydration mismatch on every price on the page.
+ *
+ * Whole hryvnia lose their kopiyky — "89 грн" is how a price is written in
+ * Ukraine, while "$2" is not how one is written in English.
  */
 export function formatPrice(minorUnits: number, currency = "UAH", locale = "uk") {
-  const whole = minorUnits % 100 === 0;
-  return new Intl.NumberFormat(locale === "uk" ? "uk-UA" : "en-US", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: whole && currency === "UAH" ? 0 : 2,
-  }).format(minorUnits / 100);
+  const label = currencyLabel(currency, locale);
+  const exact = minorUnits % 100 !== 0 || currency !== "UAH";
+  const [whole, fraction] = (minorUnits / 100).toFixed(exact ? 2 : 0).split(".");
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, locale === "uk" ? "\u00a0" : ",");
+  const number = fraction ? `${grouped}${locale === "uk" ? "," : "."}${fraction}` : grouped;
+  // Hryvnia goes after the number; dollars and euro before it.
+  return currency === "UAH" ? `${number}\u00a0${label}` : `${label}${number}`;
 }
 
 /** One unit of the currency, for the "N points per ..." line. */
 export function formatUnit(currency = "UAH", locale = "uk") {
-  return new Intl.NumberFormat(locale === "uk" ? "uk-UA" : "en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(1);
+  const label = currencyLabel(currency, locale);
+  return currency === "UAH" ? `1\u00a0${label}` : `${label}1`;
 }
+

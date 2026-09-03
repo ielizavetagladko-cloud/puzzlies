@@ -2,52 +2,27 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TopUpDialog, type TopUpOutcome } from "@/components/points/topup-dialog";
-
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
 import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { useAuth } from "@/lib/auth";
 import type { PointPack } from "@/lib/packs";
+import { startCheckout } from "@/lib/payments/checkout-form";
+import {
+  cancelPendingOrder,
+  readOrderStatus,
+  refreshPendingOrders,
+} from "@/lib/payments/pending";
 import { formatPrice, formatUnit } from "@/lib/points";
 import { useGame } from "@/lib/progress";
 
-type Checkout =
-  | { kind: "redirect"; url: string }
-  | { kind: "form"; url: string; fields: Record<string, string | string[]> };
-
-/**
- * Leaves the site for the provider's payment page.
- *
- * Some providers take the buyer by URL. WayForPay takes a signed form, which
- * has to be built and submitted — there is no address that carries it.
- */
-function goToCheckout(checkout: Checkout) {
-  if (checkout.kind === "redirect") {
-    window.location.href = checkout.url;
-    return;
-  }
-
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = checkout.url;
-  form.acceptCharset = "utf-8";
-
-  for (const [name, value] of Object.entries(checkout.fields)) {
-    for (const one of Array.isArray(value) ? value : [value]) {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = name;
-      input.value = one;
-      form.append(input);
-    }
-  }
-
-  document.body.append(form);
-  form.submit();
+/** The newest unfinished payment, if there is one. */
+function unfinishedRefOf(orders: { ref: string }[]): string | null {
+  return orders[0]?.ref ?? null;
 }
 
 export function PointsShop({ packs }: { packs: PointPack[] }) {
@@ -67,13 +42,76 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   const [dismissed, setDismissed] = useState(false);
 
   const raw = params.get("topup");
-  const outcome: TopUpOutcome | null =
-    raw === "ok" || raw === "cancelled" || raw === "pending" || raw === "failed" ? raw : null;
-  const granted = Number(params.get("points")) || 0;
+  const fromUrl: TopUpOutcome | null =
+    raw === "ok" || raw === "cancelled" || raw === "failed" ? raw : raw === "pending" ? "unfinished" : null;
+
+  // A payment we cannot confirm may still be on its way. The order is polled
+  // for a short while, so a buyer who really did pay is congratulated rather
+  // than asked whether they meant to give up.
+  const [settled, setSettled] = useState<{ outcome: TopUpOutcome; points: number } | null>(null);
+  const [unfinishedRef, setUnfinishedRef] = useState<string | null>(null);
+
+  const outcome = settled?.outcome ?? fromUrl;
+  const granted = settled?.points ?? (Number(params.get("points")) || 0);
+
+  useEffect(() => {
+    if (fromUrl !== "unfinished") return;
+
+    let live = true;
+    let tries = 0;
+
+    async function look() {
+      const orders = await refreshPendingOrders();
+      if (!live) return;
+      const ref = unfinishedRefOf(orders);
+      if (ref) setUnfinishedRef(ref);
+      return ref;
+    }
+
+    void look();
+
+    const timer = setInterval(async () => {
+      tries += 1;
+      const ref = unfinishedRef;
+      if (ref) {
+        const order = await readOrderStatus(ref);
+        if (live && order?.status === "paid") {
+          setSettled({ outcome: "ok", points: order.points });
+          clearInterval(timer);
+          return;
+        }
+      }
+      if (tries >= 10) clearInterval(timer);
+    }, 3000);
+
+    return () => {
+      live = false;
+      clearInterval(timer);
+    };
+  }, [fromUrl, unfinishedRef]);
 
   function closeDialog() {
     setDismissed(true);
     router.replace(pathname, { scroll: false });
+  }
+
+  async function abandon() {
+    if (unfinishedRef) await cancelPendingOrder(unfinishedRef);
+  }
+
+  async function resume() {
+    const order = (await refreshPendingOrders())[0];
+    if (!order) {
+      closeDialog();
+      return;
+    }
+    setBusy(order.packId);
+    const result = await startCheckout(order.packId, locale, order.ref);
+    if (result !== "left") {
+      setBusy(null);
+      setSettled(result === "already-paid" ? { outcome: "ok", points: 0 } : null);
+      if (result !== "already-paid") setMessage(dict.packs.failed);
+    }
   }
 
   // The best rate on offer, so the strongest pack can be marked as such
@@ -83,38 +121,30 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   async function buy(pack: PointPack) {
     setMessage(null);
     setBusy(pack.id);
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packId: pack.id, locale }),
-      });
+    const result = await startCheckout(pack.id, locale);
+    if (result === "left") return;
 
-      if (response.status === 401) {
-        setMessage(dict.packs.needAccount);
-        return;
-      }
-      if (response.status === 503) {
-        setMessage(dict.packs.notConfigured);
-        return;
-      }
-      if (!response.ok) {
-        setMessage(dict.packs.failed);
-        return;
-      }
-
-      goToCheckout((await response.json()) as Checkout);
-    } catch {
-      setMessage(dict.packs.failed);
-    } finally {
-      setBusy(null);
-    }
+    setBusy(null);
+    setMessage(
+      result === "not-authenticated"
+        ? dict.packs.needAccount
+        : result === "not-configured"
+          ? dict.packs.notConfigured
+          : dict.packs.failed,
+    );
   }
 
   return (
     <div className="space-y-5">
       {outcome && !dismissed && (
-        <TopUpDialog outcome={outcome} points={granted} onClose={closeDialog} />
+        <TopUpDialog
+          outcome={outcome}
+          points={granted}
+          onClose={closeDialog}
+          {...(outcome === "unfinished"
+            ? { onResume: resume, onAbandon: abandon, busy: busy !== null }
+            : null)}
+        />
       )}
 
       <div className="card-soft flex items-center justify-between gap-3 p-4">

@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { PuzzleMark } from "@/components/site/logo";
 import { Button } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
-import { PuzzleMark } from "@/components/site/logo";
 import { useI18n } from "@/i18n/provider";
 
-export type TopUpOutcome = "ok" | "cancelled" | "pending" | "failed";
+export type TopUpOutcome = "ok" | "cancelled" | "pending" | "failed" | "unfinished";
 
 /** How long a message stays before it bows out on its own. */
 const LINGER_MS = 7000;
@@ -18,21 +18,34 @@ export function TopUpDialog({
   outcome,
   points,
   onClose,
+  onResume,
+  onAbandon,
+  busy = false,
 }: {
   outcome: TopUpOutcome;
   points: number;
   onClose: () => void;
+  /** When given, the dialog asks rather than just tells. */
+  onResume?: () => void;
+  /** Answering "yes, cancel it". Dismissing the dialog does not count. */
+  onAbandon?: () => void;
+  busy?: boolean;
 }) {
   const { dict } = useI18n();
   const [leaving, setLeaving] = useState(false);
 
-  // One timer for the wait, another for the shrink — the panel has to finish
-  // animating before it is taken off the page.
+  // A dialog that asks a question waits for the answer. Only the ones that
+  // simply report something show themselves out.
+  const asksAQuestion = onResume !== undefined;
+
   useEffect(() => {
+    if (asksAQuestion) return;
     const linger = setTimeout(() => setLeaving(true), LINGER_MS);
     return () => clearTimeout(linger);
-  }, []);
+  }, [asksAQuestion]);
 
+  // One timer for the wait, another for the shrink — the panel has to finish
+  // animating before it is taken off the page.
   useEffect(() => {
     if (!leaving) return;
     const exit = setTimeout(onClose, EXIT_MS);
@@ -87,9 +100,35 @@ export function TopUpDialog({
 
         <p className="text-sm text-pretty text-ink-soft">{body}</p>
 
-        <Button variant="primary" size="lg" className="w-full" onClick={() => setLeaving(true)}>
-          {copy.close}
-        </Button>
+        {onResume ? (
+          <div className="space-y-2 pt-1">
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full"
+              disabled={busy}
+              onClick={onResume}
+            >
+              {copy.resume}
+            </Button>
+            <Button
+              variant="soft"
+              size="md"
+              className="w-full"
+              disabled={busy}
+              onClick={() => {
+                onAbandon?.();
+                setLeaving(true);
+              }}
+            >
+              {copy.abandon}
+            </Button>
+          </div>
+        ) : (
+          <Button variant="primary" size="lg" className="w-full" onClick={() => setLeaving(true)}>
+            {copy.close}
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -32,12 +32,18 @@ export async function POST(request: NextRequest) {
 
   let packId: string;
   let locale = "uk";
+  let replaces: string | null = null;
   try {
-    const body = (await request.json()) as { packId?: unknown; locale?: unknown };
+    const body = (await request.json()) as {
+      packId?: unknown;
+      locale?: unknown;
+      replaces?: unknown;
+    };
     if (typeof body.packId !== "string") throw new Error("bad body");
     packId = body.packId;
     // Only ever a language we serve — this ends up in a redirect.
     if (body.locale === "uk" || body.locale === "en") locale = body.locale;
+    if (typeof body.replaces === "string") replaces = body.replaces;
   } catch {
     return NextResponse.json({ error: "bad-request" }, { status: 400 });
   }
@@ -55,6 +61,29 @@ export async function POST(request: NextRequest) {
   // invent one, or to name their own price on it.
   const admin = getSupabaseAdminClient();
   if (!admin) return NextResponse.json({ error: "server-error" }, { status: 500 });
+
+  // Continuing an abandoned payment: the provider will not accept the same
+  // order reference twice, so a fresh order is started and the old one closed.
+  if (replaces) {
+    const { data: old } = await admin
+      .from("orders")
+      .select("status, user_id")
+      .eq("provider_ref", replaces)
+      .single();
+
+    // Someone else's order is not ours to touch, and a paid one must never be
+    // paid again — a late confirmation is a success, not a reason to re-charge.
+    if (old && old.user_id === user.id) {
+      if (old.status === "paid") {
+        return NextResponse.json({ error: "already-paid" }, { status: 409 });
+      }
+      await admin
+        .from("orders")
+        .update({ status: "cancelled" })
+        .eq("provider_ref", replaces)
+        .eq("status", "pending");
+    }
+  }
 
   const orderRef = randomUUID();
   const { error } = await admin.from("orders").insert({

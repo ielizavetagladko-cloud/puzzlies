@@ -146,7 +146,10 @@
     "historyEmpty": "Empty for now — solve your first puzzle!",
     "reset": "Reset progress",
     "resetConfirm": "Really reset all progress and points?",
-    "deleteNote": "To delete your account and all its data, write to the address in the privacy policy."
+    "deleteNote": "To delete your account and all its data, write to the address in the privacy policy.",
+    "unfinished": "Unfinished payments",
+    "unfinishedHint": "Started, but never completed.",
+    "finish": "Finish"
   },
   "reason": {
     "complete": "Puzzle solved",
@@ -184,6 +187,10 @@
     "failedTitle": "Something went wrong",
     "failedBody": "Nothing was charged. If it was, write to us and we will sort it out.",
     "close": "Got it",
-    "rate": "{n} points per {unit}"
+    "rate": "{n} points per {unit}",
+    "unfinishedTitle": "Payment not finished",
+    "unfinishedBody": "It looks like the payment did not go through. You can go back to it or cancel. And if you did pay after all, the points will arrive within minutes — nothing to do.",
+    "resume": "Continue",
+    "abandon": "Cancel payment"
   }
 }
