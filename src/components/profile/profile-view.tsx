@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
+import { EditProfileDialog } from "@/components/profile/edit-profile-dialog";
 import { PuzzleCard } from "@/components/puzzle-card";
+import { Avatar } from "@/components/ui/avatar";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
 import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
-import { DisplayName } from "@/components/profile/display-name";
 import { UnfinishedPayments } from "@/components/profile/unfinished-payments";
 import { useAuth } from "@/lib/auth";
+import { useLook } from "@/lib/leaderboard";
 import { formatSeconds } from "@/lib/points";
 import { useGame } from "@/lib/progress";
 
@@ -19,6 +22,8 @@ export function ProfileView() {
   const { state, ready, source, isUnlocked, reset } = useGame();
   const { user, signOut } = useAuth();
   const { puzzles, getPuzzle } = useCatalogue();
+  const look = useLook();
+  const [editOpen, setEditOpen] = useState(false);
 
   const solvedCount = Object.values(state.solved).reduce((sum, record) => sum + record.count, 0);
   const collection = puzzles.filter((puzzle) => puzzle.access !== "free" && isUnlocked(puzzle));
@@ -41,12 +46,35 @@ export function ProfileView() {
   return (
     <div className={`mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10 ${ready ? "" : "opacity-60"}`}>
       <header className="card-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-6">
-        <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-lilac font-display text-3xl font-bold text-lilac-ink sm:size-20">
-          {user ? user.email.slice(0, 1).toUpperCase() : "🐣"}
-        </span>
+        {user && look.avatar ? (
+          <Avatar id={look.avatar} className="size-16 shrink-0 sm:size-20" />
+        ) : (
+          <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-lilac font-display text-3xl font-bold text-lilac-ink sm:size-20">
+            {user ? user.email.slice(0, 1).toUpperCase() : "🐣"}
+          </span>
+        )}
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-xl font-bold text-ink sm:text-2xl">
-            {user ? user.email : dict.profile.guest}
+          <h1 className="flex items-center gap-1.5 font-display text-xl font-bold text-ink sm:text-2xl">
+            <span className="truncate">{user ? user.email : dict.profile.guest}</span>
+            {user && (
+              <button
+                type="button"
+                aria-label={dict.board.editProfile}
+                onClick={() => setEditOpen(true)}
+                className="grid size-7 shrink-0 place-items-center rounded-full text-ink-soft transition-colors hover:bg-surface-2 hover:text-ink focus-visible:bg-surface-2 focus-visible:text-ink"
+              >
+                <svg viewBox="0 0 20 20" aria-hidden className="size-4">
+                  <path
+                    d="M13.4 3.3a1.6 1.6 0 0 1 2.3 2.3L7.2 14.1l-3 .7.7-3 8.5-8.5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
           </h1>
           {user ? (
             <p className="text-sm text-ink-soft">
@@ -114,7 +142,7 @@ export function ProfileView() {
         )}
       </section>
 
-      <DisplayName />
+      {editOpen && <EditProfileDialog onClose={() => setEditOpen(false)} />}
 
       <UnfinishedPayments />
 

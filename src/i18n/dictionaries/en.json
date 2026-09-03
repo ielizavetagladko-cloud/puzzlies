@@ -213,6 +213,7 @@
     "nameSaved": "Saved",
     "avatarTitle": "Avatar",
     "noName": "On the board you appear as “Player {handle}”. Set a name so people know you.",
-    "setName": "Set a name"
+    "setName": "Set a name",
+    "editProfile": "Edit profile"
   }
 }
