@@ -60,14 +60,26 @@ const MOTIFS = {
 
 type Motif = keyof typeof MOTIFS;
 
-/** Background, then the motif drawn on top of it. */
+/**
+ * Background (a live theme token — the circle is meant to shift with the
+ * theme), then the motif drawn on top of it (a fixed hex, not a token).
+ *
+ * The "-ink" tokens exist for text sitting on a card, so dark mode swaps each
+ * one to a pale shade for contrast against a dark page — the same shade its
+ * own paired background here uses in light mode. Against this circle's own
+ * background, which only darkens a little, that swap collapsed the two to
+ * nearly the same colour and the motif all but vanished. Each ink below is
+ * pinned to its light-theme value instead, the same fix already made for the
+ * stats-row icons, so the motif reads the same regardless of theme — only the
+ * circle behind it is still allowed to move.
+ */
 const PALETTE = [
-  ["--lilac", "--lilac-ink"],
-  ["--peach", "--peach-ink"],
-  ["--mint", "--mint-ink"],
-  ["--sky", "--sky-ink"],
-  ["--blush", "--blush-ink"],
-  ["--lemon", "--coin-deep"],
+  ["--lilac", "#6d54c8"],
+  ["--peach", "#c4703a"],
+  ["--mint", "#2f8f6d"],
+  ["--sky", "#2b7fc4"],
+  ["--blush", "#c85a54"],
+  ["--lemon", "#d99f22"],
 ] as const;
 
 function build() {
@@ -104,7 +116,7 @@ export function Avatar({ id, className = "size-9" }: { id: string | null; classN
         rx="24"
         fill={found ? `var(${found.back})` : "var(--surface-2)"}
       />
-      <g fill={found ? `var(${found.ink})` : "var(--locked)"}>
+      <g fill={found ? found.ink : "var(--locked)"}>
         {found ? MOTIFS[found.motif] : <circle cx="24" cy="24" r="7" />}
       </g>
     </svg>
