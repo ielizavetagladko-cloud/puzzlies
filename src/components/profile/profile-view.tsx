@@ -8,6 +8,7 @@ import { PuzzleCard } from "@/components/puzzle-card";
 import { Avatar } from "@/components/ui/avatar";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
+import { StatsRow } from "@/components/ui/stats-row";
 import { useCatalogue } from "@/data/catalogue-provider";
 import { fmt, t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
@@ -46,18 +47,9 @@ export function ProfileView() {
   ].filter((part): part is string => Boolean(part));
 
   const stats = [
-    {
-      label: dict.profile.balance,
-      value: (
-        <span className="inline-flex items-center gap-1.5">
-          <CoinIcon className="size-6" />
-          {state.points}
-        </span>
-      ),
-      accent: "bg-lemon",
-    },
-    { label: dict.profile.solved, value: solvedCount, accent: "bg-mint" },
-    { label: dict.profile.totalTime, value: formatSeconds(state.totalSeconds), accent: "bg-sky" },
+    { kind: "points" as const, value: state.points, label: dict.profile.balance },
+    { kind: "solved" as const, value: solvedCount, label: dict.profile.solved },
+    { kind: "time" as const, value: formatSeconds(state.totalSeconds), label: dict.profile.totalTime },
   ];
 
   return (
@@ -124,19 +116,7 @@ export function ProfileView() {
         </section>
       )}
 
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {stats.map((item) => (
-          <div key={item.label} className="card-soft flex items-center gap-3 px-3 py-3 sm:px-4">
-            <span className={`hidden size-10 shrink-0 rounded-2xl sm:block ${item.accent}`} />
-            <span className="min-w-0">
-              <span className="block truncate font-display text-xl font-bold text-ink sm:text-2xl">
-                {item.value}
-              </span>
-              <span className="block truncate text-xs text-ink-soft">{item.label}</span>
-            </span>
-          </div>
-        ))}
-      </div>
+      <StatsRow items={stats} />
 
       <Link href={`/${locale}/points`} className={buttonClass("coin", "md")}>
         <CoinIcon className="size-5" />

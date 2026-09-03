@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ContinueCard } from "@/components/home/continue-card";
-import { StatsRow } from "@/components/home/stats";
+import { HomeStats } from "@/components/home/stats";
 import { PuzzleCard } from "@/components/puzzle-card";
 import { buttonClass } from "@/components/ui/button";
 import { isLocale } from "@/i18n/config";
@@ -51,7 +51,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      <StatsRow />
+      <HomeStats />
 
       <ContinueCard />
 
