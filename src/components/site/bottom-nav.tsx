@@ -14,6 +14,7 @@ export function BottomNav() {
 
   const home = `/${locale}`;
   const profile = `/${locale}/profile`;
+  const leaderboard = `/${locale}/leaderboard`;
 
   const items = [
     {
@@ -33,6 +34,14 @@ export function BottomNav() {
       ),
     },
     {
+      href: leaderboard,
+      label: dict.nav.leaderboard,
+      active: pathname === leaderboard,
+      icon: (
+        <path d="M5 20.5v-7h3.6v7H5Zm5.2 0V6.2h3.6v14.3h-3.6Zm5.2 0v-10H19v10h-3.6Z" />
+      ),
+    },
+    {
       href: profile,
       label: dict.nav.profile,
       active: pathname === profile,
@@ -44,7 +53,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
-      <div className="flex items-center justify-around px-2 py-1.5">
+      <div className="flex items-center justify-around gap-0.5 px-1 py-1.5">
         {items.map((item) => (
           <Link
             key={item.label}
@@ -56,7 +65,7 @@ export function BottomNav() {
             <svg viewBox="0 0 24 24" className="size-6" fill="currentColor">
               {item.icon}
             </svg>
-            {item.label}
+            <span className="w-full truncate text-center">{item.label}</span>
           </Link>
         ))}
         <div className="scale-90">

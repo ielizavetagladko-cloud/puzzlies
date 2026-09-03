@@ -8,6 +8,7 @@ import { CoinIcon } from "@/components/ui/coin";
 import { useCatalogue } from "@/data/catalogue-provider";
 import { t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
+import { DisplayName } from "@/components/profile/display-name";
 import { UnfinishedPayments } from "@/components/profile/unfinished-payments";
 import { useAuth } from "@/lib/auth";
 import { formatSeconds } from "@/lib/points";
@@ -112,6 +113,8 @@ export function ProfileView() {
           </div>
         )}
       </section>
+
+      <DisplayName />
 
       <UnfinishedPayments />
 

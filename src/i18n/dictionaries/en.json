@@ -21,7 +21,8 @@
     "theme": "Theme",
     "language": "Language",
     "privacy": "Privacy",
-    "terms": "Terms of use"
+    "terms": "Terms of use",
+    "leaderboard": "Ranking"
   },
   "home": {
     "heroTitle": "Solve puzzles, unlock new worlds",
@@ -193,5 +194,22 @@
     "abandon": "Cancel payment",
     "payNow": "Pay {price}",
     "alreadyPaid": "Already paid"
+  },
+  "board": {
+    "title": "Leaderboard",
+    "subtitle": "Average time at each difficulty. Only the same number of pieces can be compared, so every difficulty has its own table.",
+    "yourPlace": "You are {place} of {total}",
+    "yourTime": "average {time} · {solved} solved",
+    "anonymous": "Player {handle}",
+    "you": "you",
+    "solvedShort": "{n} solved",
+    "empty": "Nobody here yet. The table starts at {n} pictures solved at this difficulty.",
+    "note": "Your best time for each picture is what counts. You appear after solving at least {n} at this difficulty.",
+    "signInHint": "Sign in to join the table and see where you stand.",
+    "nameTitle": "Leaderboard name",
+    "nameHint": "Without a name you appear on the board as “Player” with a random code. Your email is never shown to anyone.",
+    "namePlaceholder": "What to call you",
+    "nameSave": "Save",
+    "nameSaved": "Saved"
   }
 }
