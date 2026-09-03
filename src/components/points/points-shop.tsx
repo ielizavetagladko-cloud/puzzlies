@@ -63,8 +63,9 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   const outcome = settled?.outcome ?? fromUrl ?? afterReturn;
   const granted = settled?.points ?? (Number(params.get("points")) || 0);
 
-  // A checkout that never came back left `busy` set. Coming back is the signal
-  // to let go of it — nothing else will.
+  // A checkout that never came back left `busy` set: the click disabled the
+  // buttons, and then the page left for the provider and was restored from the
+  // browser's cache exactly as it stood. Being back means that click is over.
   const waiting = returned ? null : busy;
 
   useEffect(() => {
@@ -126,6 +127,9 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   function closeDialog() {
     setDismissed(true);
     setAfterReturn(null);
+    // Forget the stale click for good. Without this, dropping `returned` would
+    // uncover it again and grey out the buttons the moment the dialog closed.
+    setBusy(null);
     clearReturnedFromCheckout();
     if (raw) router.replace(pathname, { scroll: false });
   }
