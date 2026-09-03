@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { Avatar } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
@@ -91,6 +92,8 @@ export function LeaderboardView() {
                 {row.place}
               </span>
 
+              <Avatar id={row.avatar} className="size-9" />
+
               <span className="min-w-0 flex-1 truncate font-display font-bold text-ink">
                 {row.displayName ?? fmt(dict.board.anonymous, { handle: row.handle })}
                 {row.isMe && (
@@ -116,6 +119,19 @@ export function LeaderboardView() {
       <p className="text-center text-xs text-pretty text-ink-soft">
         {fmt(dict.board.note, { n: RANKED_AFTER })}
       </p>
+
+      {mine && !rows.some((row) => row.isMe && row.displayName) && (
+        <div className="card-soft flex flex-col items-center gap-3 p-5 text-center sm:flex-row sm:text-start">
+          <p className="flex-1 text-sm text-pretty text-ink-soft">
+            {fmt(dict.board.noName, {
+              handle: rows.find((row) => row.isMe)?.handle ?? "····",
+            })}
+          </p>
+          <Link href={`/${locale}/profile`} className={buttonClass("soft", "md")}>
+            {dict.board.setName}
+          </Link>
+        </div>
+      )}
 
       {authReady && !user && (
         <div className="card-soft space-y-3 p-5 text-center">

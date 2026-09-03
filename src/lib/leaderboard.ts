@@ -19,6 +19,7 @@ export type BoardRow = {
   /** A scrap of hash. Enough to tell two unnamed players apart, nothing more. */
   handle: string;
   displayName: string | null;
+  avatar: string | null;
   solved: number;
   avgSeconds: number;
   isMe: boolean;
@@ -89,6 +90,7 @@ export async function fetchBoard(difficulty: DifficultyId, limit = 20): Promise<
     place: Number(row.place),
     handle: row.handle as string,
     displayName: (row.display_name as string | null) || null,
+    avatar: (row.avatar as string | null) || null,
     solved: Number(row.solved),
     avgSeconds: Number(row.avg_seconds),
     isMe: Boolean(row.is_me),
@@ -116,7 +118,9 @@ export const RANKED_AFTER = 3;
 
 // ---------------------------------------------------------- display name
 
-let storedName: string | null = null;
+export type Look = { name: string | null; avatar: string | null };
+
+let look: Look = { name: null, avatar: null };
 let nameLoaded = false;
 const nameListeners = new Set<() => void>();
 
@@ -124,7 +128,9 @@ function notifyName() {
   for (const listener of nameListeners) listener();
 }
 
-async function loadDisplayName() {
+const emptyLook: Look = { name: null, avatar: null };
+
+async function loadLook() {
   if (nameLoaded) return;
   nameLoaded = true;
 
@@ -136,44 +142,46 @@ async function loadDisplayName() {
 
   const { data } = await supabase
     .from("profiles")
-    .select("display_name")
+    .select("display_name, avatar")
     .eq("id", auth.user.id)
     .maybeSingle();
 
-  storedName = (data?.display_name as string | null) ?? null;
+  look = {
+    name: (data?.display_name as string | null) ?? null,
+    avatar: (data?.avatar as string | null) ?? null,
+  };
   notifyName();
 }
 
-/** The name already on the account, once it has been read. */
-export function useStoredDisplayName(): string | null {
+/** How the account already presents itself, once it has been read. */
+export function useLook(): Look {
   return useSyncExternalStore(
     (listener) => {
       nameListeners.add(listener);
-      void loadDisplayName();
+      void loadLook();
       return () => nameListeners.delete(listener);
     },
-    () => storedName,
-    () => null,
+    () => look,
+    () => emptyLook,
   );
 }
 
-export async function saveDisplayName(name: string): Promise<boolean> {
+export async function saveLook(next: Partial<Look>): Promise<boolean> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return false;
 
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return false;
 
-  // Only this column is writable by its owner; the rest of the profile is not.
-  const trimmed = name.trim() || null;
-  const { error } = await supabase
-    .from("profiles")
-    .update({ display_name: trimmed })
-    .eq("id", auth.user.id);
+  const patch: Record<string, string | null> = {};
+  if (next.name !== undefined) patch.display_name = next.name?.trim() || null;
+  if (next.avatar !== undefined) patch.avatar = next.avatar;
 
+  // Only these two columns are writable by their owner; the balance is not.
+  const { error } = await supabase.from("profiles").update(patch).eq("id", auth.user.id);
   if (error) return false;
 
-  storedName = trimmed;
+  look = { ...look, ...next, name: next.name === undefined ? look.name : next.name?.trim() || null };
   notifyName();
   return true;
 }
