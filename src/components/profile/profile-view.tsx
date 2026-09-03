@@ -55,7 +55,9 @@ export function ProfileView() {
         )}
         <div className="min-w-0 flex-1">
           <h1 className="flex items-center gap-1.5 font-display text-xl font-bold text-ink sm:text-2xl">
-            <span className="truncate">{user ? user.email : dict.profile.guest}</span>
+            <span className="truncate">
+              {user ? (look.name ?? user.email) : dict.profile.guest}
+            </span>
             {user && (
               <button
                 type="button"
@@ -77,7 +79,11 @@ export function ProfileView() {
             )}
           </h1>
           {user ? (
-            <p className="text-sm text-ink-soft">
+            <p className="truncate text-sm text-ink-soft">
+              {/* The heading switches to the chosen name, so the email — the
+                  account's actual identifier — moves down here rather than
+                  disappearing. */}
+              {look.name ? `${user.email} · ` : ""}
               {dict.auth.account} ·{" "}
               {{ google: "Google", apple: "Apple", email: "Email" }[user.provider]}
               {user.linkedGuestProgress ? ` · ${dict.auth.linked}` : ""}
