@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Button, buttonClass } from "@/components/ui/button";
@@ -25,6 +26,17 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  // What the payment left behind in the URL on the way back.
+  const outcome = useSearchParams().get("topup");
+  const outcomeMessage =
+    outcome === "ok"
+      ? dict.packs.success
+      : outcome === "cancelled"
+        ? dict.packs.cancelled
+        : outcome === "pending"
+          ? dict.packs.pending
+          : null;
+
   // The best rate on offer, so the strongest pack can be marked as such
   // instead of leaving the reader to divide in their head.
   const bestRate = Math.max(...packs.map((pack) => pack.points / pack.priceCents));
@@ -36,7 +48,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packId: pack.id }),
+        body: JSON.stringify({ packId: pack.id, locale }),
       });
 
       if (response.status === 401) {
@@ -63,6 +75,17 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
 
   return (
     <div className="space-y-5">
+      {outcomeMessage && (
+        <p
+          className={`card-soft p-4 text-center text-sm text-pretty ${
+            outcome === "ok" ? "text-mint-ink" : "text-ink-soft"
+          }`}
+        >
+          {outcome === "ok" ? "🎉 " : ""}
+          {outcomeMessage}
+        </p>
+      )}
+
       <div className="card-soft flex items-center justify-between gap-3 p-4">
         <span className="text-sm text-ink-soft">{dict.unlock.balance}</span>
         <span className="inline-flex items-center gap-1.5 font-display text-xl font-bold text-ink">

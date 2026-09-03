@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { PointsShop } from "@/components/points/points-shop";
 import { isLocale, locales } from "@/i18n/config";
@@ -32,7 +33,11 @@ export default async function PointsPage({ params }: PageProps<"/[lang]/points">
         <p className="mt-1 text-base text-pretty text-ink-soft">{dict.packs.subtitle}</p>
       </header>
 
-      <PointsShop packs={packs} />
+      {/* The shop reads the payment outcome from the URL, and that needs a
+          boundary or the whole page would give up being prerendered. */}
+      <Suspense fallback={null}>
+        <PointsShop packs={packs} />
+      </Suspense>
     </div>
   );
 }

@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
     outcome = "pending";
   }
 
-  // The proxy sends "/" on to the right language.
-  return NextResponse.redirect(new URL(`/?topup=${outcome}`, request.nextUrl.origin));
+  const lang = request.nextUrl.searchParams.get("lang") === "en" ? "en" : "uk";
+  return NextResponse.redirect(
+    new URL(`/${lang}/points?topup=${outcome}`, request.nextUrl.origin),
+  );
 }

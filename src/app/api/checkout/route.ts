@@ -27,10 +27,13 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "not-authenticated" }, { status: 401 });
 
   let packId: string;
+  let locale = "uk";
   try {
-    const body = (await request.json()) as { packId?: unknown };
+    const body = (await request.json()) as { packId?: unknown; locale?: unknown };
     if (typeof body.packId !== "string") throw new Error("bad body");
     packId = body.packId;
+    // Only ever a language we serve — this ends up in a redirect.
+    if (body.locale === "uk" || body.locale === "en") locale = body.locale;
   } catch {
     return NextResponse.json({ error: "bad-request" }, { status: 400 });
   }
@@ -68,7 +71,7 @@ export async function POST(request: NextRequest) {
     points: pack.points,
     amountCents: pack.price_cents,
     email: user.email ?? null,
-    returnUrl: `${origin}/api/payments/return`,
+    returnUrl: `${origin}/api/payments/return?lang=${locale}`,
   });
 
   if (!checkout.ok) return NextResponse.json({ error: checkout.reason }, { status: 502 });
