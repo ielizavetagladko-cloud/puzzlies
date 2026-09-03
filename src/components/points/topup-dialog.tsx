@@ -19,6 +19,7 @@ export function TopUpDialog({
   points,
   onClose,
   onResume,
+  resumeLabel,
   onAbandon,
   busy = false,
 }: {
@@ -27,6 +28,11 @@ export function TopUpDialog({
   onClose: () => void;
   /** When given, the dialog asks rather than just tells. */
   onResume?: () => void;
+  /**
+   * What the resume button says. It names the action and the sum, because
+   * "continue" reads as "continue to the site" — the opposite of where it goes.
+   */
+  resumeLabel?: string;
   /** Answering "yes, cancel it". Dismissing the dialog does not count. */
   onAbandon?: () => void;
   busy?: boolean;
@@ -109,7 +115,7 @@ export function TopUpDialog({
               disabled={busy}
               onClick={onResume}
             >
-              {copy.resume}
+              {resumeLabel}
             </Button>
             <Button
               variant="soft"
@@ -123,6 +129,18 @@ export function TopUpDialog({
             >
               {copy.abandon}
             </Button>
+
+            {/* The way out for someone who did pay and only wants to get back
+                to the game while the confirmation catches up. It leaves the
+                order alone: the money decides, not this button. */}
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setLeaving(true)}
+              className="w-full pt-1 text-sm text-ink-soft underline underline-offset-4 hover:text-ink disabled:opacity-50"
+            >
+              {copy.alreadyPaid}
+            </button>
           </div>
         ) : (
           <Button variant="primary" size="lg" className="w-full" onClick={() => setLeaving(true)}>

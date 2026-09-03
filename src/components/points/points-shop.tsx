@@ -23,11 +23,6 @@ import {
 import { formatPrice, formatUnit } from "@/lib/points";
 import { reloadProgress, useGame } from "@/lib/progress";
 
-/** The newest unfinished payment, if there is one. */
-function unfinishedRefOf(orders: { ref: string }[]): string | null {
-  return orders[0]?.ref ?? null;
-}
-
 export function PointsShop({ packs }: { packs: PointPack[] }) {
   const { dict, locale } = useI18n();
   const { user, ready: authReady } = useAuth();
@@ -59,7 +54,11 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   // for a short while, so a buyer who really did pay is congratulated rather
   // than asked whether they meant to give up.
   const [settled, setSettled] = useState<{ outcome: TopUpOutcome; points: number } | null>(null);
-  const [unfinishedRef, setUnfinishedRef] = useState<string | null>(null);
+  const [unfinished, setUnfinished] = useState<{
+    ref: string;
+    amountMinorUnits: number;
+    currency: string;
+  } | null>(null);
 
   const outcome = settled?.outcome ?? fromUrl ?? afterReturn;
   const granted = settled?.points ?? (Number(params.get("points")) || 0);
@@ -83,7 +82,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
         return;
       }
       if (order.status === "pending") {
-        setUnfinishedRef(order.ref);
+        setUnfinished(order);
         setAfterReturn("unfinished");
       }
     })();
@@ -99,19 +98,14 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
     let live = true;
     let tries = 0;
 
-    async function look() {
-      const orders = await refreshPendingOrders();
-      if (!live) return;
-      const ref = unfinishedRefOf(orders);
-      if (ref) setUnfinishedRef(ref);
-      return ref;
-    }
-
-    void look();
+    void (async () => {
+      const order = (await refreshPendingOrders())[0];
+      if (live && order) setUnfinished(order);
+    })();
 
     const timer = setInterval(async () => {
       tries += 1;
-      const ref = unfinishedRef;
+      const ref = unfinished?.ref;
       if (ref) {
         const order = await readOrderStatus(ref);
         if (live && order?.status === "paid") {
@@ -127,7 +121,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
       live = false;
       clearInterval(timer);
     };
-  }, [fromUrl, unfinishedRef]);
+  }, [fromUrl, unfinished]);
 
   function closeDialog() {
     setDismissed(true);
@@ -137,7 +131,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
   }
 
   async function abandon() {
-    if (unfinishedRef) await cancelPendingOrder(unfinishedRef);
+    if (unfinished) await cancelPendingOrder(unfinished.ref);
   }
 
   async function resume() {
@@ -184,7 +178,16 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
           points={granted}
           onClose={closeDialog}
           {...(outcome === "unfinished"
-            ? { onResume: resume, onAbandon: abandon, busy: waiting !== null }
+            ? {
+                onResume: resume,
+                resumeLabel: fmt(dict.packs.payNow, {
+                  price: unfinished
+                    ? formatPrice(unfinished.amountMinorUnits, unfinished.currency, locale)
+                    : "",
+                }).trim(),
+                onAbandon: abandon,
+                busy: waiting !== null,
+              }
             : null)}
         />
       )}

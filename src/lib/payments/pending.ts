@@ -176,13 +176,15 @@ export async function readLatestOrder(): Promise<{
   ref: string;
   status: string;
   points: number;
+  amountMinorUnits: number;
+  currency: string;
 } | null> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return null;
 
   const { data } = await supabase
     .from("orders")
-    .select("provider_ref, status, points_granted")
+    .select("provider_ref, status, points_granted, amount_cents, currency")
     .not("pack_id", "is", null)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -193,6 +195,8 @@ export async function readLatestOrder(): Promise<{
     ref: data.provider_ref as string,
     status: data.status as string,
     points: (data.points_granted as number) ?? 0,
+    amountMinorUnits: (data.amount_cents as number) ?? 0,
+    currency: (data.currency as string) ?? "UAH",
   };
 }
 
