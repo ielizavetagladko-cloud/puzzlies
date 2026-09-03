@@ -12,12 +12,42 @@ import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { useAuth } from "@/lib/auth";
 import type { PointPack } from "@/lib/packs";
-import { formatPrice } from "@/lib/points";
+import { formatPrice, formatUnit } from "@/lib/points";
 import { useGame } from "@/lib/progress";
 
-/** Leaves the site for the provider's payment page. */
-function goToCheckout(url: string) {
-  window.location.href = url;
+type Checkout =
+  | { kind: "redirect"; url: string }
+  | { kind: "form"; url: string; fields: Record<string, string | string[]> };
+
+/**
+ * Leaves the site for the provider's payment page.
+ *
+ * Some providers take the buyer by URL. WayForPay takes a signed form, which
+ * has to be built and submitted — there is no address that carries it.
+ */
+function goToCheckout(checkout: Checkout) {
+  if (checkout.kind === "redirect") {
+    window.location.href = checkout.url;
+    return;
+  }
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = checkout.url;
+  form.acceptCharset = "utf-8";
+
+  for (const [name, value] of Object.entries(checkout.fields)) {
+    for (const one of Array.isArray(value) ? value : [value]) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = one;
+      form.append(input);
+    }
+  }
+
+  document.body.append(form);
+  form.submit();
 }
 
 export function PointsShop({ packs }: { packs: PointPack[] }) {
@@ -48,7 +78,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
 
   // The best rate on offer, so the strongest pack can be marked as such
   // instead of leaving the reader to divide in their head.
-  const bestRate = Math.max(...packs.map((pack) => pack.points / pack.priceCents));
+  const bestRate = Math.max(...packs.map((pack) => pack.points / pack.priceMinorUnits));
 
   async function buy(pack: PointPack) {
     setMessage(null);
@@ -73,8 +103,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
         return;
       }
 
-      const { redirectUrl } = (await response.json()) as { redirectUrl: string };
-      goToCheckout(redirectUrl);
+      goToCheckout((await response.json()) as Checkout);
     } catch {
       setMessage(dict.packs.failed);
     } finally {
@@ -98,7 +127,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
 
       <div className="grid gap-3 sm:grid-cols-3">
         {packs.map((pack) => {
-          const rate = pack.points / pack.priceCents;
+          const rate = pack.points / pack.priceMinorUnits;
           const best = rate >= bestRate;
           return (
             <div
@@ -118,7 +147,10 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
                 {pack.points}
               </span>
               <span className="text-xs text-ink-soft">
-                {fmt(dict.packs.perDollar, { n: Math.round(rate * 100) })}
+                {fmt(dict.packs.rate, {
+                  n: Math.round(rate * 100),
+                  unit: formatUnit(pack.currency, locale),
+                })}
               </span>
 
               <Button
@@ -128,7 +160,7 @@ export function PointsShop({ packs }: { packs: PointPack[] }) {
                 disabled={busy !== null || !authReady}
                 onClick={() => buy(pack)}
               >
-                {formatPrice(pack.priceCents)}
+                {formatPrice(pack.priceMinorUnits, pack.currency, locale)}
               </Button>
             </div>
           );

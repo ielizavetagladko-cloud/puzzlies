@@ -169,7 +169,6 @@
     "buy": "Buy",
     "points": "points",
     "best": "best value",
-    "perDollar": "{n} points per dollar",
     "notConfigured": "Payment is not connected yet. We are setting up a provider — top-ups will work as soon as it is ready.",
     "needAccount": "Sign in first, so your points do not get lost.",
     "failed": "Could not start the payment. Try again in a minute.",
@@ -185,6 +184,7 @@
     "pendingBody": "Your points will appear in a few minutes. Solve something free meanwhile.",
     "failedTitle": "Something went wrong",
     "failedBody": "Nothing was charged. If it was, write to us and we will sort it out.",
-    "close": "Got it"
+    "close": "Got it",
+    "rate": "{n} points per {unit}"
   }
 }

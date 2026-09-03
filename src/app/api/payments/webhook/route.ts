@@ -23,8 +23,10 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     // An invalid signature is someone poking at the endpoint; an ignored event
     // is normal traffic we have no interest in.
-    const status = result.reason === "invalid-signature" ? 401 : 200;
-    return NextResponse.json({ received: true }, { status });
+    if (result.reason === "invalid-signature") {
+      return NextResponse.json({ received: true }, { status: 401 });
+    }
+    return acknowledge(result.reply);
   }
 
   const admin = getSupabaseAdminClient();
@@ -41,5 +43,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: outcome?.reason ?? "failed" }, { status: 500 });
   }
 
-  return NextResponse.json({ received: true });
+  return acknowledge(result.reply);
+}
+
+/**
+ * Some providers require a specific reply and keep retrying until they get it;
+ * for the rest a plain 200 is enough.
+ */
+function acknowledge(reply: string | undefined) {
+  if (!reply) return NextResponse.json({ received: true });
+  return new NextResponse(reply, {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 }

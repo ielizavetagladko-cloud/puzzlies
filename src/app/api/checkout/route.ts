@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   const { data: pack } = await supabase
     .from("point_packs")
-    .select("id, points, price_cents")
+    .select("id, points, price_cents, currency")
     .eq("id", packId)
     .eq("is_active", true)
     .single();
@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     user_id: user.id,
     pack_id: pack.id,
     amount_cents: pack.price_cents,
+    currency: pack.currency,
     provider: provider.id,
     provider_ref: orderRef,
     status: "pending",
@@ -69,12 +70,19 @@ export async function POST(request: NextRequest) {
     orderRef,
     packId: pack.id,
     points: pack.points,
-    amountCents: pack.price_cents,
+    amountMinorUnits: pack.price_cents,
+    currency: pack.currency ?? "UAH",
     email: user.email ?? null,
+    locale,
     returnUrl: `${origin}/api/payments/return?lang=${locale}`,
+    webhookUrl: `${origin}/api/payments/webhook`,
   });
 
   if (!checkout.ok) return NextResponse.json({ error: checkout.reason }, { status: 502 });
 
-  return NextResponse.json({ redirectUrl: checkout.redirectUrl });
+  return NextResponse.json(
+    checkout.kind === "form"
+      ? { kind: "form", url: checkout.url, fields: checkout.fields }
+      : { kind: "redirect", url: checkout.url },
+  );
 }

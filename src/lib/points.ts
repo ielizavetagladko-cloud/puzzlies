@@ -60,10 +60,26 @@ export function formatSeconds(total: number) {
 }
 
 /** Prices are always shown in dollars, so the US format reads the same in both languages. */
-export function formatPrice(cents: number) {
-  return new Intl.NumberFormat("en-US", {
+/**
+ * A price in the currency it will actually be charged in.
+ *
+ * Whole hryvnia are written without kopiyky — "89 ₴" is how a price is written
+ * in Ukraine, while "$2" is not how one is written in English.
+ */
+export function formatPrice(minorUnits: number, currency = "UAH", locale = "uk") {
+  const whole = minorUnits % 100 === 0;
+  return new Intl.NumberFormat(locale === "uk" ? "uk-UA" : "en-US", {
     style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(cents / 100);
+    currency,
+    minimumFractionDigits: whole && currency === "UAH" ? 0 : 2,
+  }).format(minorUnits / 100);
+}
+
+/** One unit of the currency, for the "N points per ..." line. */
+export function formatUnit(currency = "UAH", locale = "uk") {
+  return new Intl.NumberFormat(locale === "uk" ? "uk-UA" : "en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(1);
 }
