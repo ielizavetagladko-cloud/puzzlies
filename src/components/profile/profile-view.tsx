@@ -92,6 +92,11 @@ export function ProfileView() {
         ))}
       </div>
 
+      <Link href={`/${locale}/points`} className={buttonClass("coin", "md")}>
+        <CoinIcon className="size-5" />
+        {dict.packs.topUp}
+      </Link>
+
       <section>
         <h2 className="mb-3 font-display text-xl font-bold text-ink">{dict.profile.collection}</h2>
         {collection.length === 0 ? (

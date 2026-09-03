@@ -481,13 +481,30 @@ async function upload() {
   say("\nГотово. Каталог у базі тепер посилається на сховище.\n");
 }
 
+// ---------------------------------------------------------------------- sync
+
+/** Pushes the catalogue to the database without touching any picture. */
+async function sync() {
+  const env = await readEnv();
+  if (!env.SUPABASE_SERVICE_ROLE_KEY || !env.NEXT_PUBLIC_SUPABASE_URL) {
+    fail("Потрібен SUPABASE_SERVICE_ROLE_KEY у .env.local.");
+  }
+  const catalog = await readJson(CATALOG, { categories: [], puzzles: [] });
+  await syncCatalogue(env, catalog);
+  say(`\nБазу оновлено: ${catalog.puzzles.length} пазлів, ${catalog.categories.length} категорій.\n`);
+}
+
 // ---------------------------------------------------------------------- main
 
 const command = process.argv[2];
 if (command === "scan") await scan();
 else if (command === "apply") await apply();
 else if (command === "upload") await upload();
+else if (command === "sync") await sync();
 else {
-  say("\nВикористання:\n  npm run images:scan\n  npm run images:apply\n  npm run images:upload\n");
+  say(
+    "\nВикористання:\n  npm run images:scan\n  npm run images:apply" +
+      "\n  npm run images:upload\n  npm run images:sync\n",
+  );
   process.exit(1);
 }

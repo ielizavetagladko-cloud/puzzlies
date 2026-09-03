@@ -155,11 +155,27 @@
     "unlock": "Picture unlocked",
     "welcome": "Welcome bonus",
     "guest": "Guest progress",
-    "refund": "Refund"
+    "refund": "Refund",
+    "purchase": "Points purchased"
   },
   "seo": {
     "site": "Puzzlies — jigsaw puzzles in your browser: solve pictures, earn points and unlock new ones. Free, no sign-up, on phone and desktop.",
     "puzzle": "Solve the “{title}” jigsaw online — 12, 48, 108 or 300 pieces. Right in your browser, no sign-up.",
     "category": "{blurb}. {n} jigsaw puzzles to solve free in your browser."
+  },
+  "packs": {
+    "title": "Top up points",
+    "subtitle": "Points unlock any picture. The bigger the pack, the better the rate.",
+    "buy": "Buy",
+    "points": "points",
+    "best": "best value",
+    "perDollar": "{n} points per dollar",
+    "notConfigured": "Payment is not connected yet. We are setting up a provider — top-ups will work as soon as it is ready.",
+    "needAccount": "Sign in first, so your points do not get lost.",
+    "failed": "Could not start the payment. Try again in a minute.",
+    "success": "Thank you! Your points have been added.",
+    "cancelled": "Payment cancelled — nothing was charged.",
+    "pending": "Payment is being processed. Your points will appear in a few minutes.",
+    "topUp": "Top up"
   }
 }

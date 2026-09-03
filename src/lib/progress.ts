@@ -32,7 +32,14 @@ import type {
 
 const STORAGE_KEY = "puzzlies.progress.v1";
 
-export type PointReason = "complete" | "replay" | "unlock" | "welcome" | "guest" | "refund";
+export type PointReason =
+  | "complete"
+  | "replay"
+  | "unlock"
+  | "welcome"
+  | "guest"
+  | "refund"
+  | "purchase";
 
 export type PointEntry = {
   id: string;
@@ -124,9 +131,9 @@ function addEntry(state: GameState, entry: PointEntry) {
 // ----------------------------------------------------------------- account
 
 function reasonOf(value: string): PointReason {
-  return (["complete", "replay", "unlock", "welcome", "guest", "refund"] as const).includes(
-    value as PointReason,
-  )
+  return (
+    ["complete", "replay", "unlock", "welcome", "guest", "refund", "purchase"] as const
+  ).includes(value as PointReason)
     ? (value as PointReason)
     : "complete";
 }

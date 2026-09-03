@@ -170,8 +170,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-tuscany.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "nature-sunflower",
@@ -183,8 +183,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-sunflower.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "water-turquoise",
@@ -272,8 +272,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-rocky.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "water-shell",
@@ -285,8 +285,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/water-shell.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "mountains-misty",
@@ -374,8 +374,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-ice.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "mountains-blue",
@@ -387,8 +387,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/mountains-blue.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "city-retro-car",
@@ -476,8 +476,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-bench.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "city-tunnel",
@@ -489,8 +489,8 @@
       "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/city-tunnel.jpg",
       "width": 1200,
       "height": 900,
-      "access": "paid",
-      "priceCents": 125
+      "access": "points",
+      "pointsCost": 400
     },
     {
       "id": "art-the-harvesters",
@@ -530,7 +530,33 @@
       "width": 2400,
       "height": 1800,
       "access": "points",
-      "pointsCost": 500,
+      "pointsCost": 50,
+      "license": "public-domain"
+    },
+    {
+      "id": "art-the-musicians",
+      "categoryId": "art",
+      "title": {
+        "uk": "Музиканти",
+        "en": "The Musicians"
+      },
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-musicians.jpg",
+      "width": 2400,
+      "height": 1800,
+      "access": "free",
+      "license": "public-domain"
+    },
+    {
+      "id": "art-the-trojan-women-setting-fire-to-their-fleet",
+      "categoryId": "art",
+      "title": {
+        "uk": "Троянські жінки підпалюють свій флот",
+        "en": "The Trojan Women Setting Fire to Their Fleet"
+      },
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-trojan-women-setting-fire-to-their-fleet.jpg",
+      "width": 2400,
+      "height": 1800,
+      "access": "free",
       "license": "public-domain"
     }
   ]

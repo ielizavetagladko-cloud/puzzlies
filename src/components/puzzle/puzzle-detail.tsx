@@ -180,7 +180,17 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                   ? fmt(dict.puzzle.notEnoughPoints, { n: missing })
                   : fmt(dict.puzzle.unlockFor, { n: cost })}
               </Button>
-              {missing > 0 && <p className="text-center text-xs text-ink-soft">{dict.unlock.notEnough}</p>}
+              {missing > 0 && (
+                <>
+                  <p className="text-center text-xs text-ink-soft">{dict.unlock.notEnough}</p>
+                  <Link
+                    href={`/${locale}/points`}
+                    className={buttonClass("soft", "md", "w-full")}
+                  >
+                    {dict.packs.topUp}
+                  </Link>
+                </>
+              )}
             </div>
           ) : (
             <div className="card-soft space-y-3 p-4">

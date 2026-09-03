@@ -10,7 +10,8 @@
     "images:scan": "node scripts/images.mjs scan",
     "images:apply": "node scripts/images.mjs apply",
     "seed": "node supabase/generate-seed.mjs > supabase/seed.sql",
-    "images:upload": "node scripts/images.mjs upload"
+    "images:upload": "node scripts/images.mjs upload",
+    "images:sync": "node scripts/images.mjs sync"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
