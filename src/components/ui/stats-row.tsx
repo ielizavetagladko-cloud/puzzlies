@@ -17,10 +17,15 @@ function PuzzleGlyph({ className }: { className?: string }) {
     // smaller than the coin and the clock, which both fill most of their box.
     <svg viewBox="11 11 26 26" aria-hidden className={className}>
       {/* Same piece as the puzzle avatar motif — one jigsaw shape for the
-          whole site, not a second one invented just for this square. */}
+          whole site, not a second one invented just for this square.
+          Colour is the fixed light-theme --mint-ink, not the token: that
+          token flips to a pale shade in dark mode (made for text sitting on
+          a dark card, not for standing out against its own square) and the
+          glyph nearly vanished into bg-mint. The coin icon never had this
+          problem — its colours were never theme-linked to begin with. */}
       <path
         d="M20.1 17.1H21.9A4.2 4.2 0 0 1 30.3 17.1H32.1A3 3 0 0 1 35.1 20.1V32.1A3 3 0 0 1 32.1 35.1H20.1A3 3 0 0 1 17.1 32.1V30.3A4.2 4.2 0 0 1 17.1 21.9V20.1A3 3 0 0 1 20.1 17.1Z"
-        fill="var(--mint-ink)"
+        fill="#2f8f6d"
       />
     </svg>
   );
@@ -30,11 +35,13 @@ function ClockGlyph({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none">
       {/* Same radius as the coin's own outer ring, so the two read as the
-          same size sitting in their squares. */}
-      <circle cx="12" cy="12" r="10" stroke="var(--sky-ink)" strokeWidth="1.8" />
+          same size sitting in their squares. Fixed colour for the same
+          reason as the puzzle piece above — var(--sky-ink) turns pale in
+          dark mode and the clock disappeared into bg-sky. */}
+      <circle cx="12" cy="12" r="10" stroke="#2b7fc4" strokeWidth="1.8" />
       <path
         d="M12 6.5v5.5l3.8 2.2"
-        stroke="var(--sky-ink)"
+        stroke="#2b7fc4"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
