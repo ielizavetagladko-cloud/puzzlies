@@ -206,13 +206,14 @@
     "note": "Your best time for each picture is what counts. You appear after solving at least {n} at this difficulty.",
     "signInHint": "Sign in to join the table and see where you stand.",
     "nameTitle": "Name and avatar",
-    "nameHint": "Without a name you appear on the board as “Player” with a random code. Your email is never shown to anyone.",
+    "nameHint": "Without a name you are “Player {handle}”. Your email is never shown to anyone.",
     "namePlaceholder": "What to call you",
     "nameSave": "Save",
     "nameSaved": "Saved",
     "avatarTitle": "Avatar",
     "noName": "On the board you appear as “Player {handle}”. Set a name so people know you.",
     "setName": "Set a name",
-    "editProfile": "Edit profile"
+    "editProfile": "Edit profile",
+    "nameHintLoading": "Loading…"
   }
 }

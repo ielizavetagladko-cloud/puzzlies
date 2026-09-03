@@ -9,7 +9,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button, buttonClass } from "@/components/ui/button";
 import { CoinIcon } from "@/components/ui/coin";
 import { useCatalogue } from "@/data/catalogue-provider";
-import { t } from "@/i18n/config";
+import { fmt, t } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { UnfinishedPayments } from "@/components/profile/unfinished-payments";
 import { useAuth } from "@/lib/auth";
@@ -28,12 +28,20 @@ export function ProfileView() {
   const solvedCount = Object.values(state.solved).reduce((sum, record) => sum + record.count, 0);
   const collection = puzzles.filter((puzzle) => puzzle.access !== "free" && isUnlocked(puzzle));
 
-  // The heading switches to the chosen name, so the email — the account's
-  // actual identifier — moves down here rather than disappearing. "Account ·
-  // Email" told the player nothing they didn't already know, so it is gone;
-  // only what is actually informative stays.
+  // Before a name is set, this shows exactly what the leaderboard would show
+  // for the same account — "Player 1395" — rather than the email, so a new
+  // player sees the one identity they will actually be recognised by anywhere
+  // on the site. The email still appears briefly while the handle is loading,
+  // so the heading is never blank.
+  const anonymousName = look.handle ? fmt(dict.board.anonymous, { handle: look.handle }) : null;
+  const headingName = user ? (look.name ?? anonymousName ?? user.email) : dict.profile.guest;
+
+  // The heading only shows the email as a last resort, so the subtitle
+  // restores it whenever the heading has moved on to something else — a name
+  // or the anonymous handle. "Account · Email" told the player nothing they
+  // didn't already know, so that is gone; only what is informative stays.
   const subtitle = [
-    look.name ? user?.email : null,
+    user && headingName !== user.email ? user.email : null,
     user?.linkedGuestProgress ? dict.auth.linked : null,
   ].filter((part): part is string => Boolean(part));
 
@@ -55,18 +63,18 @@ export function ProfileView() {
   return (
     <div className={`mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10 ${ready ? "" : "opacity-60"}`}>
       <header className="card-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-6">
-        {user && look.avatar ? (
+        {user ? (
+          // Unset, this renders the same neutral circle the leaderboard shows
+          // for an avatar-less player — one fallback, drawn by one component.
           <Avatar id={look.avatar} className="size-16 shrink-0 sm:size-20" />
         ) : (
           <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-lilac font-display text-3xl font-bold text-lilac-ink sm:size-20">
-            {user ? user.email.slice(0, 1).toUpperCase() : "🐣"}
+            🐣
           </span>
         )}
         <div className="min-w-0 flex-1">
           <h1 className="flex items-center gap-1.5 font-display text-xl font-bold text-ink sm:text-2xl">
-            <span className="truncate">
-              {user ? (look.name ?? user.email) : dict.profile.guest}
-            </span>
+            <span className="truncate">{headingName}</span>
             {user && (
               <button
                 type="button"

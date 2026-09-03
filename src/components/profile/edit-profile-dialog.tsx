@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Avatar, AVATARS } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { fmt } from "@/i18n/config";
 import { useI18n } from "@/i18n/provider";
 import { saveLook, useLook } from "@/lib/leaderboard";
 
@@ -108,7 +109,12 @@ export function EditProfileDialog({ onClose }: { onClose: () => void }) {
 
         <div className="pe-8">
           <h2 className="font-display text-lg font-bold text-ink">{dict.board.nameTitle}</h2>
-          <p className="text-sm text-pretty text-ink-soft">{dict.board.nameHint}</p>
+          <p className="text-sm text-pretty text-ink-soft">
+            {/* Names the exact fallback the player is looking at right now,
+                rather than a generic "a random code" — the same one shown in
+                the header and on the leaderboard. */}
+            {look.handle ? fmt(dict.board.nameHint, { handle: look.handle }) : dict.board.nameHintLoading}
+          </p>
         </div>
 
         <div className="flex items-center gap-3">

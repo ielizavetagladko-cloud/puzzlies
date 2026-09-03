@@ -118,9 +118,18 @@ export const RANKED_AFTER = 3;
 
 // ---------------------------------------------------------- display name
 
-export type Look = { name: string | null; avatar: string | null };
+export type Look = {
+  name: string | null;
+  avatar: string | null;
+  /**
+   * The same scrap of hash the leaderboard would show for this player —
+   * "Player 1395" — computed by the database from their own id so it can never
+   * disagree with what the board actually displays. Null only until it loads.
+   */
+  handle: string | null;
+};
 
-let look: Look = { name: null, avatar: null };
+let look: Look = { name: null, avatar: null, handle: null };
 let nameLoaded = false;
 const nameListeners = new Set<() => void>();
 
@@ -128,7 +137,7 @@ function notifyName() {
   for (const listener of nameListeners) listener();
 }
 
-const emptyLook: Look = { name: null, avatar: null };
+const emptyLook: Look = { name: null, avatar: null, handle: null };
 
 async function loadLook() {
   if (nameLoaded) return;
@@ -140,15 +149,15 @@ async function loadLook() {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return;
 
-  const { data } = await supabase
-    .from("profiles")
-    .select("display_name, avatar")
-    .eq("id", auth.user.id)
-    .maybeSingle();
+  const [profile, handle] = await Promise.all([
+    supabase.from("profiles").select("display_name, avatar").eq("id", auth.user.id).maybeSingle(),
+    supabase.rpc("my_handle"),
+  ]);
 
   look = {
-    name: (data?.display_name as string | null) ?? null,
-    avatar: (data?.avatar as string | null) ?? null,
+    name: (profile.data?.display_name as string | null) ?? null,
+    avatar: (profile.data?.avatar as string | null) ?? null,
+    handle: (handle.data as string | null) ?? null,
   };
   notifyName();
 }
