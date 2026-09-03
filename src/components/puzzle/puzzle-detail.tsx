@@ -256,14 +256,9 @@ export function PuzzleDetail({ puzzle }: { puzzle: Puzzle }) {
                     <span className="font-display font-bold text-ink">{cost}</span>
                   </p>
                 ) : (
-                  <>
-                    <p className="font-display text-2xl font-bold text-ink">
-                      {formatPrice(puzzle.priceCents ?? 0)}
-                    </p>
-                    <p className="rounded-2xl bg-lemon/60 px-3 py-2 text-xs text-ink">
-                      ⚠️ {dict.shop.mockNotice}
-                    </p>
-                  </>
+                  <p className="font-display text-2xl font-bold text-ink">
+                    {formatPrice(puzzle.priceCents ?? 0)}
+                  </p>
                 )}
 
                 <div className="flex gap-2">

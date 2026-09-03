@@ -52,33 +52,6 @@ export type PaymentProvider = {
   readWebhook(body: string, headers: Headers): Promise<WebhookResult>;
 };
 
-/**
- * Test provider. Skips the payment and returns straight to the site, so the
- * whole flow can be walked through locally.
- *
- * Off unless PAYMENTS_PROVIDER=mock is set, and that variable is deliberately
- * not set in production: with it on, anyone could mint points for free.
- */
-const mockProvider: PaymentProvider = {
-  id: "mock",
-  async createCheckout({ orderRef, returnUrl }) {
-    const url = new URL(returnUrl);
-    url.searchParams.set("mock_ref", orderRef);
-    return { ok: true, kind: "redirect", url: url.toString() };
-  },
-  async readWebhook(body) {
-    try {
-      const parsed = JSON.parse(body) as { orderRef?: string };
-      if (!parsed.orderRef) return { ok: false, reason: "ignored" };
-      return { ok: true, orderRef: parsed.orderRef };
-    } catch {
-      return { ok: false, reason: "ignored" };
-    }
-  },
-};
-
 export function getPaymentProvider(): PaymentProvider | null {
-  // The test provider is opt-in and never wins over a real one by accident.
-  if (process.env.PAYMENTS_PROVIDER === "mock") return mockProvider;
   return createWayForPayProvider();
 }

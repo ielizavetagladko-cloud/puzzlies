@@ -98,7 +98,6 @@
   },
   "shop": {
     "buyTitle": "Buy this picture",
-    "mockNotice": "Test payment: no real money is charged.",
     "confirm": "Confirm purchase",
     "success": "Thank you! The picture is unlocked.",
     "notAvailable": "Payment is not connected yet — it arrives with Stripe. For now, unlock pictures with points."
