@@ -75,7 +75,10 @@ export class PuzzleEngine {
     originX: number;
     originY: number;
   } | null = null;
-  private pan: { x: number; y: number; tx: number; ty: number } | null = null;
+  // `moved` gates the very first bit of motion: a pointer that comes down
+  // just outside a piece and lifts again without travelling anywhere should
+  // read as a missed grab, not a flick of the whole board.
+  private pan: { x: number; y: number; tx: number; ty: number; moved: boolean } | null = null;
   private pinch: { dist: number; cx: number; cy: number; scale: number; tx: number; ty: number } | null =
     null;
 
@@ -396,6 +399,7 @@ export class PuzzleEngine {
         y: event.clientY - rect.top,
         tx: this.view.tx,
         ty: this.view.ty,
+        moved: false,
       };
     }
   };
@@ -423,8 +427,19 @@ export class PuzzleEngine {
 
     if (this.pan) {
       const rect = this.canvas.getBoundingClientRect();
-      this.view.tx = this.pan.tx + (event.clientX - rect.left - this.pan.x);
-      this.view.ty = this.pan.ty + (event.clientY - rect.top - this.pan.y);
+      const dx = event.clientX - rect.left - this.pan.x;
+      const dy = event.clientY - rect.top - this.pan.y;
+
+      // A near-miss grab and a genuine pan both start the same way — a
+      // pointerdown that landed just off a piece. They only tell apart once
+      // the pointer has actually travelled: a tap barely moves before lifting,
+      // a pan does. Below this many pixels nothing happens yet, so a missed
+      // grab that ends in place never nudges the board.
+      if (!this.pan.moved && Math.hypot(dx, dy) < 4) return;
+      this.pan.moved = true;
+
+      this.view.tx = this.pan.tx + dx;
+      this.view.ty = this.pan.ty + dy;
       this.viewTouched = true;
       this.requestDraw();
     }
