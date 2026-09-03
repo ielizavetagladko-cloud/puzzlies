@@ -48,6 +48,11 @@
   --apple-ledge: #3a3a3c;
 
   --shadow-rgb: 90 78 120;
+
+  /* A lit top edge. The light theme separates cards with a drop shadow, so it
+     needs none; on a dark page that shadow is invisible and the rim does the
+     work instead. */
+  --card-rim: 0 0 rgb(0 0 0 / 0);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,9 +61,9 @@
 
     --paper: #201b2e;
     --paper-2: #191527;
-    --surface: #2b2440;
-    --surface-2: #332b4b;
-    --line: #40385a;
+    --surface: #302848;
+    --surface-2: #3a3157;
+    --line: #574c7d;
 
     --ink: #f4efff;
     --ink-soft: #b3aacb;
@@ -88,6 +93,7 @@
     --apple-ledge: #b0adb8;
 
     --shadow-rgb: 8 5 16;
+    --card-rim: inset 0 1px 0 rgb(255 255 255 / 0.07);
   }
 }
 
@@ -96,9 +102,9 @@
 
   --paper: #201b2e;
   --paper-2: #191527;
-  --surface: #2b2440;
-  --surface-2: #332b4b;
-  --line: #40385a;
+  --surface: #302848;
+  --surface-2: #3a3157;
+  --line: #574c7d;
 
   --ink: #f4efff;
   --ink-soft: #b3aacb;
@@ -128,6 +134,7 @@
   --apple-ledge: #b0adb8;
 
   --shadow-rgb: 8 5 16;
+  --card-rim: inset 0 1px 0 rgb(255 255 255 / 0.07);
 }
 
 @theme inline {
@@ -317,7 +324,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 1.75rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--card-rim), var(--shadow-card);
 }
 
 @utility no-scrollbar {
