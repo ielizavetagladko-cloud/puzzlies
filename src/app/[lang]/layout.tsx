@@ -105,7 +105,6 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
-            <div className="pb-28 md:pb-0" />
             <BottomNav />
           </CatalogueProvider>
         </I18nProvider>

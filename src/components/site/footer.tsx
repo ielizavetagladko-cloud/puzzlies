@@ -18,7 +18,12 @@ export function SiteFooter() {
   ];
 
   return (
-    <footer className="border-t border-line/70 px-4 py-6 sm:px-6">
+    // The bottom nav is fixed and overlaps whatever the page would otherwise
+    // show underneath it. This padding belongs to the footer's own box —
+    // its background extends down and blurs through the nav's translucent
+    // bar — rather than sitting in a separate spacer after it, which used to
+    // leave a gap of bare page background between the two.
+    <footer className="border-t border-line/70 px-4 pt-6 pb-28 sm:px-6 md:pb-6">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center">
         <span className="font-display text-sm font-bold text-ink-soft">
           🧩 {dict.common.appName}
