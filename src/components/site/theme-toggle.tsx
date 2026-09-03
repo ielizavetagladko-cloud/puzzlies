@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 
 import { useI18n } from "@/i18n/provider";
 
@@ -39,8 +39,24 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeToggle() {
-  const { dict } = useI18n();
+  const { dict, locale } = useI18n();
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
+
+  // Switching language changes the root layout's own [lang] segment, and Next
+  // re-renders that layout's <html> element for it — which wipes data-theme,
+  // since it was only ever set imperatively by the pre-paint script and never
+  // appears in the layout's JSX for React to preserve. Reasserting it here,
+  // synchronously before the browser paints, undoes that wipe before anyone
+  // sees a flash of the wrong theme. localStorage is untouched by any of this,
+  // so it stays the one true record of what the player actually chose.
+  useLayoutEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(KEY);
+      if (saved === "dark" || saved === "light") applyTheme(saved);
+    } catch {
+      /* ignore */
+    }
+  }, [locale]);
 
   return (
     <button

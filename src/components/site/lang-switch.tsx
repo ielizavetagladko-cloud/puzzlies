@@ -25,7 +25,6 @@ export function LangSwitch() {
     const segments = pathname.split("/");
     segments[1] = next;
     router.push(segments.join("/") || `/${next}`);
-    router.refresh();
   }
 
   return (
