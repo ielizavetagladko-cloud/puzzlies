@@ -11,6 +11,7 @@
  * file is written.
  */
 
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -94,7 +95,16 @@ async function uploadToStorage(env, name, body) {
     },
   );
   if (!response.ok) throw new Error(`${name}: ${response.status} ${await response.text()}`);
-  return `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(name)}`;
+
+  // A re-upload replaces the file but keeps the name, so every cache between
+  // here and the player — the browser's, and Next's image optimiser — would go
+  // on serving the old picture, and for a year: that is what the immutable
+  // header above promises. The promise is kept per URL rather than broken by
+  // stamping the content's own hash into it, so new bytes mean a new address
+  // and a re-cropped picture actually reaches the people who saw the old one.
+  const version = createHash("sha256").update(body).digest("hex").slice(0, 8);
+  const base = `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${BUCKET}`;
+  return `${base}/${encodeURIComponent(name)}?v=${version}`;
 }
 
 // --------------------------------------------------------------------- utils
@@ -272,6 +282,9 @@ async function scan() {
       priceCents: kept?.priceCents ?? 125,
       license: kept?.license ?? "own",
       skip: kept?.skip ?? false,
+      // Left out entirely unless set by hand — most pictures crop fine on
+      // their own, and an absent field beats "attention" repeated 40 times.
+      ...(kept?.crop ? { crop: kept.crop } : null),
       source: { width: meta.width ?? 0, height: meta.height ?? 0 },
       warnings,
     });
@@ -341,8 +354,10 @@ async function apply() {
 
     await image
       // "cover" fills the 4:3 frame and trims the overflow, so no letterboxing
-      // ever reaches the board.
-      .resize(width, height, { fit: "cover", position: "attention" })
+      // ever reaches the board. Sharp picks where to crop from on its own
+      // ("attention" hunts for the interesting part) unless plan.json names a
+      // side explicitly — e.g. "south" keeps the bottom and trims the top.
+      .resize(width, height, { fit: "cover", position: item.crop ?? "attention" })
       .jpeg({ quality: 82, mozjpeg: true })
       .toFile(target);
 

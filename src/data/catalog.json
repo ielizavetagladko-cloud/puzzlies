@@ -499,7 +499,7 @@
         "uk": "Жнива",
         "en": "The Harvesters"
       },
-      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-harvesters.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-harvesters.jpg?v=b7faecdc",
       "width": 2400,
       "height": 1800,
       "access": "points",
@@ -513,7 +513,7 @@
         "uk": "Мелодія кохання",
         "en": "The Love Song"
       },
-      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-love-song.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-love-song.jpg?v=85b3006b",
       "width": 2400,
       "height": 1800,
       "access": "free",
@@ -526,7 +526,7 @@
         "uk": "Площа Святого Марка",
         "en": "Piazza San Marco"
       },
-      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-piazza-san-marco.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-piazza-san-marco.jpg?v=327c01c9",
       "width": 2400,
       "height": 1800,
       "access": "points",
@@ -540,7 +540,7 @@
         "uk": "Музиканти",
         "en": "The Musicians"
       },
-      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-musicians.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-musicians.jpg?v=914d26c8",
       "width": 2400,
       "height": 1800,
       "access": "free",
@@ -553,11 +553,24 @@
         "uk": "Троянські жінки підпалюють свій флот",
         "en": "The Trojan Women Setting Fire to Their Fleet"
       },
-      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-trojan-women-setting-fire-to-their-fleet.jpg",
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/art-the-trojan-women-setting-fire-to-their-fleet.jpg?v=be951e92",
       "width": 2400,
       "height": 1800,
       "access": "free",
       "license": "public-domain"
+    },
+    {
+      "id": "nature-landscape",
+      "categoryId": "nature",
+      "title": {
+        "uk": "Ландшафт",
+        "en": "Landscape"
+      },
+      "image": "https://mpxtcdofjtirdzgnuqkn.supabase.co/storage/v1/object/public/puzzles/nature-landscape.jpg?v=7da49ac2",
+      "width": 2400,
+      "height": 1800,
+      "access": "free",
+      "license": "own"
     }
   ]
 }
