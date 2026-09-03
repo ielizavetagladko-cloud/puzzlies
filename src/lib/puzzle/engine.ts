@@ -392,7 +392,11 @@ export class PuzzleEngine {
       const inGroup = new Set(members);
       this.loose = this.loose.filter((item) => !inGroup.has(item)).concat(members);
       this.requestDraw();
-    } else {
+    } else if (event.pointerType !== "touch") {
+      // A finger missing a piece is the whole complaint this guards against —
+      // on touch, one finger only ever picks up a piece; panning is what the
+      // second finger is for. A mouse has no such ambiguity (the pointer is
+      // exact), so dragging empty space with it still pans as before.
       const rect = this.canvas.getBoundingClientRect();
       this.pan = {
         x: event.clientX - rect.left,
