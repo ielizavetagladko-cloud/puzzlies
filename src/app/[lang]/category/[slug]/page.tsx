@@ -55,7 +55,7 @@ export default async function CategoryPage({ params }: PageProps<"/[lang]/catego
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
       <Link
-        href={`/${lang}#categories`}
+        href={`/${lang}/categories`}
         className="inline-flex items-center gap-1.5 font-display text-sm font-semibold text-ink-soft transition-colors hover:text-ink"
       >
         ← {dict.category.backToAll}

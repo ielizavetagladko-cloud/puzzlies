@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -6,8 +5,7 @@ import { ContinueCard } from "@/components/home/continue-card";
 import { StatsRow } from "@/components/home/stats";
 import { PuzzleCard } from "@/components/puzzle-card";
 import { buttonClass } from "@/components/ui/button";
-import { accentClasses } from "@/data/catalog";
-import { isLocale, t } from "@/i18n/config";
+import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getCatalogue } from "@/lib/catalogue";
 
@@ -15,7 +13,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const dict = await getDictionary(lang);
-  const { categories, puzzles } = await getCatalogue();
+  const { puzzles } = await getCatalogue();
 
   const freePuzzles = puzzles.filter((puzzle) => puzzle.access === "free");
 
@@ -74,62 +72,6 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {/* -------------------------------------------------------- categories */}
-      <section id="categories" className="scroll-mt-20">
-        <div className="mb-3">
-          <h2 className="font-display text-xl font-bold text-ink sm:text-2xl">
-            {dict.home.categoriesTitle}
-          </h2>
-          <p className="text-sm text-ink-soft">{dict.home.categoriesSubtitle}</p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {categories.map((category) => {
-            const list = puzzles.filter((puzzle) => puzzle.categoryId === category.id);
-            const accent = accentClasses[category.accent];
-            return (
-              <Link
-                key={category.id}
-                href={`/${lang}/category/${category.slug}`}
-                className="card-soft group flex items-center gap-4 overflow-hidden p-3 transition-transform duration-200 hover:-translate-y-1"
-              >
-                <span
-                  className={`grid size-16 shrink-0 place-items-center rounded-3xl text-3xl ${accent.bg}`}
-                >
-                  {category.icon}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-display text-lg font-bold text-ink">
-                    {t(category.title, lang)}
-                  </span>
-                  <span className="block truncate text-sm text-ink-soft">
-                    {t(category.blurb, lang)}
-                  </span>
-                  <span className={`mt-1 inline-block font-display text-xs font-bold ${accent.text}`}>
-                    {list.length} {dict.category.puzzles}
-                  </span>
-                </span>
-                <span className="hidden shrink-0 gap-1 sm:flex">
-                  {list.slice(0, 3).map((puzzle) => (
-                    <span
-                      key={puzzle.id}
-                      className="relative size-14 overflow-hidden rounded-2xl border border-line"
-                    >
-                      <Image
-                        src={puzzle.image}
-                        alt=""
-                        fill
-                        sizes="56px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    </span>
-                  ))}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
     </div>
   );
 }

@@ -26,9 +26,9 @@ export function BottomNav() {
       ),
     },
     {
-      href: `${home}#categories`,
+      href: `/${locale}/categories`,
       label: dict.nav.categories,
-      active: pathname.includes("/category/"),
+      active: pathname.includes("/category/") || pathname.includes("/categories"),
       icon: (
         <path d="M4.5 4.5h6v6h-6v-6Zm9 0h6v6h-6v-6Zm-9 9h6v6h-6v-6Zm9 0h6v6h-6v-6Z" />
       ),

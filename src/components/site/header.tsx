@@ -23,7 +23,7 @@ export function SiteHeader() {
 
   const links = [
     { href: `/${locale}`, label: dict.nav.home },
-    { href: `/${locale}#categories`, label: dict.nav.categories },
+    { href: `/${locale}/categories`, label: dict.nav.categories },
     { href: `/${locale}/leaderboard`, label: dict.nav.leaderboard },
     { href: `/${locale}/profile`, label: dict.nav.profile },
   ];
