@@ -81,7 +81,7 @@ export function TopUpDialog({
           is near-white in the dark one and would veil the page in white. */}
       <button
         type="button"
-        aria-label={copy.close}
+        aria-label={dict.common.close}
         onClick={() => setLeaving(true)}
         className="absolute inset-0 cursor-default bg-[rgb(var(--shadow-rgb)/0.45)] backdrop-blur-sm"
       />
@@ -94,6 +94,25 @@ export function TopUpDialog({
           leaving ? "animate-shrink-out" : "animate-grow-in"
         }`}
       >
+        {/* Clicking away and Escape both close this, but neither is visible.
+            A cross is the one way out everybody already knows. */}
+        <button
+          type="button"
+          aria-label={dict.common.close}
+          onClick={() => setLeaving(true)}
+          className="absolute end-3 top-3 grid size-9 place-items-center rounded-full text-ink-soft transition-colors hover:bg-surface-2 hover:text-ink focus-visible:bg-surface-2 focus-visible:text-ink"
+        >
+          <svg viewBox="0 0 20 20" aria-hidden className="size-5">
+            <path
+              d="M5.5 5.5l9 9m0-9l-9 9"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+
         <PuzzleMark className="mx-auto size-14 animate-float" />
 
         <h2 className="font-display text-2xl font-bold text-balance text-ink">{title}</h2>
