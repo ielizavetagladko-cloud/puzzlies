@@ -11,7 +11,11 @@ export type StatKind = "points" | "solved" | "time";
  */
 function PuzzleGlyph({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" aria-hidden className={className}>
+    // Cropped tight to the piece's own bounding box (centre (24,24), ~22
+    // wide) instead of the full 48-unit canvas it shares with the avatar
+    // version — at the avatar's wider crop this glyph rendered noticeably
+    // smaller than the coin and the clock, which both fill most of their box.
+    <svg viewBox="11 11 26 26" aria-hidden className={className}>
       {/* Same piece as the puzzle avatar motif — one jigsaw shape for the
           whole site, not a second one invented just for this square. */}
       <path
@@ -25,9 +29,11 @@ function PuzzleGlyph({ className }: { className?: string }) {
 function ClockGlyph({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none">
-      <circle cx="12" cy="12" r="8.6" stroke="var(--sky-ink)" strokeWidth="1.8" />
+      {/* Same radius as the coin's own outer ring, so the two read as the
+          same size sitting in their squares. */}
+      <circle cx="12" cy="12" r="10" stroke="var(--sky-ink)" strokeWidth="1.8" />
       <path
-        d="M12 7.4v4.9l3.3 1.9"
+        d="M12 6.5v5.5l3.8 2.2"
         stroke="var(--sky-ink)"
         strokeWidth="1.8"
         strokeLinecap="round"
