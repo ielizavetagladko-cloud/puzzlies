@@ -28,6 +28,15 @@ export function ProfileView() {
   const solvedCount = Object.values(state.solved).reduce((sum, record) => sum + record.count, 0);
   const collection = puzzles.filter((puzzle) => puzzle.access !== "free" && isUnlocked(puzzle));
 
+  // The heading switches to the chosen name, so the email — the account's
+  // actual identifier — moves down here rather than disappearing. "Account ·
+  // Email" told the player nothing they didn't already know, so it is gone;
+  // only what is actually informative stays.
+  const subtitle = [
+    look.name ? user?.email : null,
+    user?.linkedGuestProgress ? dict.auth.linked : null,
+  ].filter((part): part is string => Boolean(part));
+
   const stats = [
     {
       label: dict.profile.balance,
@@ -78,17 +87,10 @@ export function ProfileView() {
               </button>
             )}
           </h1>
-          {user ? (
-            <p className="truncate text-sm text-ink-soft">
-              {/* The heading switches to the chosen name, so the email — the
-                  account's actual identifier — moves down here rather than
-                  disappearing. */}
-              {look.name ? `${user.email} · ` : ""}
-              {dict.auth.account} ·{" "}
-              {{ google: "Google", apple: "Apple", email: "Email" }[user.provider]}
-              {user.linkedGuestProgress ? ` · ${dict.auth.linked}` : ""}
-            </p>
-          ) : (
+          {user && subtitle.length > 0 ? (
+            <p className="truncate text-sm text-ink-soft">{subtitle.join(" · ")}</p>
+          ) : null}
+          {!user && (
             <p className="text-sm text-pretty text-ink-soft">{dict.profile.guestNote}</p>
           )}
         </div>
